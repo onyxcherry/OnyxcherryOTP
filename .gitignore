@@ -1,0 +1,7 @@
+*.py[cod]
+__pycache__
+venv
+onyxcherryotp.log*
+.vscode
+app.db
+*:Zone.Identifier

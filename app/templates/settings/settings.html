@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block app_content %}
+    <h1>{{ _('Settings') }}</h1>
+    {% if twofa_enabled %}
+    <h2>{{ ('Turn off 2FA') }}:</h2>
+    {% else %}
+    <h2>{{ _('Turn on 2FA') }}:</h2>
+    {% endif %}
+    <p><img id="2fa-image" src="{{ url_for('static', filename='2fa.png') }}"></p>
+    <!-- <button type="button" class="btn btn-primary">Primary</button> -->
+    {% if twofa_enabled %}
+    <a href="{{ url_for('auth.deactivate_2fa') }}" class="btn btn-warning">{{ _('Turn off 2FA') }}</a>
+    {% else %}
+    <a href="{{ url_for('auth.twofa') }}" class="btn btn-primary">{{ _('Turn on 2FA') }}</a>
+    {% endif %}
+{% endblock %}

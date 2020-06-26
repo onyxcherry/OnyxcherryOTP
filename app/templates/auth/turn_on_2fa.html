@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+
+{% block app_content %}
+<style>
+.panel-heading {
+    font-size: 26px;
+}
+.panel-body {
+    font-size: 20px;
+}
+</style>
+
+<h1>{{ _('Turn on 2FA') }}</h1>
+<div id="2fa-messages"></div>
+<div class="panel panel-info">
+    <div class="panel-heading">You are activating two factor authentication.</div>
+    <div class="panel-body">Please keep the secret private.</div>
+</div>
+<div class="panel panel-success" style="display: none;">
+    <div class="panel-heading"></div>
+    <div class="panel-body"></div>
+</div>
+<div class="panel panel-danger" style="display: none;">
+    <div class="panel-heading"></div>
+    <div class="panel-body"></div>
+</div>
+
+<div id="2fa-qrcode" style="display: block;"></div>
+<div id="2fa-user-code" style="display: none;" class="col-md-4">
+    <div class="panel panel-primary panel-body" style="display: none;"></div>
+
+    <form action="/auth/checkcode" method="POST" class="form" role="form" onsubmit="submitForm(event, this)">
+
+        <button type="button" id="changeview" onclick="changeSecretView()" class="btn btn-secondary" style="margin-bottom: 20px;">{{ _('Show secret as text') }}</button>
+        <div class="form-group required">
+            <label class="control-label" for="user_code">OTP code: </label>
+            <input class="form-control" id="user_code" name="user_code" required type="text">
+        </div>
+        <input class="btn btn-default" id="submit" name="submit" type="submit" value="Submit">
+    </form>
+</div>
+
+<button id="getTokenButton" onclick="getToken()" class="btn btn-primary" style="margin-top: 20px;">{{ _('I understand') }}</button>
+
+<script src="/static/qrcode.min.js" defer></script>
+<script src="/static/get2FASecret.js" defer></script>
+{% endblock %}
