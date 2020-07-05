@@ -15,7 +15,7 @@ def index():
 @bp.route('/settings')
 @login_required
 def settings():
-    twofa_enabled = OTP.query.filter_by(user_id=current_user.get_id()).first().is_valid == 1
-    if twofa_enabled:
-        return render_template('settings/settings.html', title=_('Settings'), twofa_enabled=twofa_enabled)
+    user_twofa = OTP.query.filter_by(user_id=current_user.get_id()).first()
+    if user_twofa and user_twofa.is_valid == 1:
+        return render_template('settings/settings.html', title=_('Settings'), twofa_enabled=True)
     return render_template('settings/settings.html', title=_('Settings'))

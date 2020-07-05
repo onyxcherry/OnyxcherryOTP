@@ -37,9 +37,10 @@ def login():
             flash(_('Invalid username or password'))
             return redirect(url_for('auth.login'))
         onetimepass = OTP.query.filter_by(user_id=user.id).first()
+        remember_me = form.remember_me.data
         if onetimepass and onetimepass.is_valid == 1:
             form = TwoFALogin()
-            token = user.set_valid_credentials()
+            token = user.set_valid_credentials(remember_me)
             return render_template('auth/2fa_login.html', form=form, token=token)
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
@@ -128,18 +129,23 @@ def refresh_login():
 def generate_token():
     if current_user.is_anonymous:
         abort(401)
-    if not OTP.query.filter_by(user_id=current_user.get_id()).first(): #or otp_row.is_valid == 0: #a właściwie - czy is_valid == False
+    user_otp = OTP.query.filter_by(user_id=current_user.get_id()).first()
+    if not user_otp:
         onetimepass = OTP(secret=pyotp.random_base32(), is_valid=False, user_id=current_user.get_id())
         db.session.add(onetimepass)
         db.session.commit()
+    elif user_otp.is_valid == False:
+        user_otp.secret = pyotp.random_base32()
+        db.session.add(user_otp)
+        db.session.commit()
     otp_secret = OTP.query.filter_by(user_id=current_user.get_id()).first().secret
     user = User.query.filter_by(id=current_user.get_id()).first()
+    app_qrcode = pyotp.totp.TOTP(otp_secret).provisioning_uri(name=user.email, issuer_name='Onyxcherry OTP')
     status = 'OK'
-    for_qrcode = pyotp.totp.TOTP(otp_secret).provisioning_uri(name=user.email, issuer_name='Onyxcherry OTP')
     resp = {
         "status": status,
         "secret": otp_secret,
-        "for_qrcode": for_qrcode
+        "app_qrcode": app_qrcode
     }
     return jsonify(resp)
 
@@ -168,6 +174,7 @@ def check_2fa_login():
             algorithms=['HS256'])
         jwt_username = jwt_decoded['twofa_login']
         jwt_exp = jwt_decoded['exp']
+        jwt_remember_me = jwt_decoded['remember_me']
     except:
             flash(_('Invalid token!'))
             return redirect(url_for('auth.login'))
@@ -177,7 +184,7 @@ def check_2fa_login():
     latest = pyotp.TOTP(otp_secret_database).verify(otp_code)
     previous = pyotp.TOTP(otp_secret_database).at(datetime.now()-timedelta(seconds=30)) == otp_code
     if latest or previous:
-        login_user(user)
+        login_user(user, remember=jwt_remember_me)
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('main.index')

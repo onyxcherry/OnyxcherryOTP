@@ -7,7 +7,7 @@
 * Reset password by email
 * Activate and deactivate 2FA
 * Two latest OTP are valid
-* QR Code rendered at client-side (with pure Javascript library)
+* QR Code rendered at client-side (by a pure Javascript library)
 * Easy translations with Flask-Babel
 
 #### Since client get only secret code (asynchronous), it is no need to deal with images and its caching by robots etc.
@@ -44,9 +44,11 @@ flask shell
 ```bash
 python -c 'from os import urandom; from base64 import b64encode; print(b64encode(urandom(32)).decode("utf-8"))'
 ```
-and change secrets in .env and in config.py to generated above.
+and change secrets in .env and in config.py to the generated above.
 
-> WARNING: app running on development environment
+> WARNING: app is running on development environment
+
+OnyxcherryOTP uses SendGrid to sending emails. Set `MAIL_LOCALHOST=True` in the .env if you want to send emails to localhost. Type `python3 -m smtpd -n -c DebuggingServer localhost:8465` in another console window.
 
 ### TO-DO:
 * Add Captcha

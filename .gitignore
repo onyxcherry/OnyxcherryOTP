@@ -5,3 +5,5 @@ onyxcherryotp.log*
 .vscode
 app.db
 *:Zone.Identifier
+sort.py
+.env

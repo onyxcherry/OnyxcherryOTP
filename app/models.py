@@ -25,8 +25,8 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return bcrypt.check_password_hash(self.password_hash, password)
 
-    def set_valid_credentials(self, expires_in=60):
-        return jwt.encode({'twofa_login': self.username, 'exp': time() + expires_in},
+    def set_valid_credentials(self, remember_me, expires_in=60):
+        return jwt.encode({'twofa_login': self.username, 'remember_me': remember_me, 'exp': time() + expires_in},
         current_app.config['TWOFA_SECRET_KEY'], algorithm='HS256').decode('utf-8')
 
     def get_reset_password_token(self, expires_in=600):

@@ -85,8 +85,8 @@ function getToken() {
         .then(response => {
             panel_info.firstElementChild.innerText = 'Scan the QR and type the code from app below.'
             panel_info.children[1].innerText = 'Use an OTP app, e.g. Authy or Google Authenticator.'
-            if (response['for_qrcode']) {
-                var svgNode = QRCode(response['for_qrcode'])
+            if (response['app_qrcode']) {
+                var svgNode = QRCode(response['app_qrcode'])
             } else {
                 errorDiv()
             }
