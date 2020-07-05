@@ -28,29 +28,20 @@ class User(UserMixin, db.Model):
     def set_valid_credentials(self, expires_in=60):
         return jwt.encode({'twofa_login': self.username, 'exp': time() + expires_in},
         current_app.config['TWOFA_SECRET_KEY'], algorithm='HS256').decode('utf-8')
-    
-    @staticmethod
-    def verify_valid_credentials(token):
-        try:
-            user_id = jwt.decode(token, current_app.config['TWOFA_SECRET_KEY'],
-            algorithms=['HS256'])['twofa_login']
-        except:
-            return
-        return OTP.query.get(user_id)
 
     def get_reset_password_token(self, expires_in=600):
         return jwt.encode(
-            {'reset_password': self.id, 'exp': time() + expires_in},
+            {'reset_password': self.username, 'exp': time() + expires_in},
             current_app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
 
     @staticmethod
     def verify_reset_password_token(token):
         try:
-            id = jwt.decode(token, current_app.config['SECRET_KEY'],
+            username = jwt.decode(token, current_app.config['SECRET_KEY'],
                             algorithms=['HS256'])['reset_password']
         except:
             return
-        return User.query.get(id)
+        return User.query.filter_by(username=username).first()
 
 
 class OTP(db.Model):
