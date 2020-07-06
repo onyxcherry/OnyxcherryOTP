@@ -1,6 +1,8 @@
 import datetime
 from datetime import datetime, timedelta
 from time import time
+import os
+from base64 import b64encode
 
 import jwt
 import pyotp
@@ -17,7 +19,7 @@ from app.auth.email import send_password_reset_email
 from app.auth.forms import (CheckOTPCode, LoginForm, RefreshLogin,
                             RegistrationForm, ResetPasswordForm,
                             ResetPasswordRequestForm, TwoFALogin)
-from app.models import OTP, User
+from app.models import OTP, User, ResetPasswordValue
 
 
 @bp.route('/')
@@ -75,8 +77,23 @@ def reset_password_request():
     form = ResetPasswordRequestForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user:
-            send_password_reset_email(user)
+        if user:          
+            reset_password_db = ResetPasswordValue.query.filter_by(user_id=user.id).first()
+            if reset_password_db: user.delete_expired_tokens(reset_password_db)        
+            value = b64encode(os.urandom(16)).decode('utf-8')
+            token = user.get_reset_password_token(value)
+            db_date = datetime.utcnow()
+            if not reset_password_db:
+                reset_password_new = ResetPasswordValue(first_value=value, first_date=db_date, user_id=user.id)
+            elif not reset_password_db.first_value:         
+                reset_password_db.first_value = value
+                reset_password_db.first_date = db_date
+            elif not reset_password_db.second_value:
+                reset_password_db.second_value = value
+                reset_password_db.second_date = db_date
+            db.session.add(reset_password_db)
+            db.session.commit()
+            send_password_reset_email(user, token)
         flash(_('Check your email for the instructions to reset your password.'))
         return redirect(url_for('auth.login'))
     return render_template('auth/reset_password_request.html', title=_('Reset Password'), form=form)
@@ -85,12 +102,27 @@ def reset_password_request():
 def reset_password(token):
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
-    user = User.verify_reset_password_token(token)
+    user, value = User.verify_reset_password_token(token)
     if not user:
         return redirect(url_for('main.index'))
+    reset_password_db = ResetPasswordValue.query.filter_by(user_id=user.id).first()
+    if reset_password_db:       
+        user.delete_expired_tokens(reset_password_db)   
     form = ResetPasswordForm()
     if form.validate_on_submit():
-        user.set_password(form.password.data)
+        if value == reset_password_db.first_value:
+            reset_password_db.first_value = None
+            reset_password_db.first_date = None
+            user.set_password(form.password.data)
+        elif value == reset_password_db.second_value:
+            reset_password_db.second_value = None
+            reset_password_db.second_date = None
+            user.set_password(form.password.data)
+        else:
+            flash(_('Invalid or expired token'))
+            return redirect(url_for('auth.reset_password_request'))
+        db.session.add(reset_password_db)
+        db.session.add(user)
         db.session.commit()
         flash(_('Your password has been reset.'))
         return redirect(url_for('auth.login'))
