@@ -1,7 +1,3 @@
-import logging
-import os
-from logging.handlers import RotatingFileHandler, SMTPHandler
-
 from flask import Flask, current_app, request
 from flask_babel import Babel
 from flask_babel import lazy_gettext as _l

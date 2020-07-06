@@ -1,5 +1,5 @@
 from app import cli, create_app, db
-from app.models import OTP, User, ResetPasswordValue
+from app.models import OTP, ResetPasswordValue, User
 
 app = create_app()
 cli.register(app)

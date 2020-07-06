@@ -1,8 +1,6 @@
-import datetime
-from datetime import datetime, timedelta
-from time import time
 import os
 from base64 import b64encode
+from datetime import datetime, timedelta
 
 import jwt
 import pyotp
@@ -19,7 +17,7 @@ from app.auth.email import send_password_reset_email
 from app.auth.forms import (CheckOTPCode, LoginForm, RefreshLogin,
                             RegistrationForm, ResetPasswordForm,
                             ResetPasswordRequestForm, TwoFALogin)
-from app.models import OTP, User, ResetPasswordValue
+from app.models import OTP, ResetPasswordValue, User
 
 
 @bp.route('/')
