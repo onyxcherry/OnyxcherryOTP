@@ -1,8 +1,8 @@
 from flask_babel import _
 from flask_babel import lazy_gettext as _l
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm, RecaptchaField
 from wtforms import BooleanField, PasswordField, StringField, SubmitField
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length
 
 from app.models import User
 
@@ -14,11 +14,12 @@ class LoginForm(FlaskForm):
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField(_l('Username'), validators=[DataRequired()])
-    email = StringField(_l('Email'), validators=[DataRequired(), Email()])
-    password = PasswordField(_l('Password'), validators=[DataRequired()])
+    username = StringField(_l('Username'), validators=[DataRequired(), Length(min=3, max=64)])
+    email = StringField(_l('Email'), validators=[DataRequired(), Email(), Length(max=120)])
+    password = PasswordField(_l('Password'), validators=[DataRequired(), Length(min=8, max=128)])
     password2 = PasswordField(
         _l('Repeat Password'), validators=[DataRequired(), EqualTo('password')])
+    recaptcha = RecaptchaField()
     submit = SubmitField(_l('Register'))
 
     def validate_username(self, username):

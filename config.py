@@ -38,3 +38,5 @@ class Config(object):
     REMEMBER_COOKIE_SECURE=False # move to True on production
     REMEMBER_COOKIE_HTTPONLY=True
     
+    RECAPTCHA_PUBLIC_KEY=os.environ.get('RECAPTCHA_PUBLIC_KEY')
+    RECAPTCHA_PRIVATE_KEY=os.environ.get('RECAPTCHA_PRIVATE_KEY')
