@@ -5,18 +5,35 @@
 {% endblock %}
 
 {% block navbar %}
+<style>
+    html {
+        font-size: 10px;
+    }
+</style>
+<!-- <nav class="navbar navbar-expand-lg navbar-light bg-light" >
+<nav class="navbar navbar-light bg-light">
+    <a class="navbar-brand" href="#">
+        <img src="https://onyxcherry.pl/img/onyxcherry.jpg" width="60em" height="60em" class="d-inline-block align-top" alt="" loading="lazy">
+    </a>
+  </nav>
+    <a class="navbar-brand" href="{{ url_for('main.index') }}" style="font-size: 4rem;">OnyxcherryOTP</a>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav" style="font-size: 3rem;">
+        <a class="nav-item nav-link active" href="{{ url_for('main.index') }}">{{ _('Home') }}<span class="sr-only">(current)</span></a>
+        <a class="nav-item nav-link" href="{{ url_for('main.settings') }}">{{ _('Settings') }}</a>
+    </div>
+        <div class="nav navbar-nav navbar-right">
+        <a class="nav-item nav-link" href="#">Pricing</a>
+        </div>
+    </div>
+  </nav> -->
+
     <nav class="navbar navbar-default">
         <div class="container">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="{{ url_for('main.index') }}">Onyxcherry OTP</a>
+                <a class="navbar-brand" href="{{ url_for('main.index') }}" style="font-size: 2em;">Onyxcherry OTP</a>
             </div>
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" style="font-size: 1.5em;">
                 <ul class="nav navbar-nav">
                     <li><a href="{{ url_for('main.index') }}">{{ _('Home') }}</a></li>
                 </ul>

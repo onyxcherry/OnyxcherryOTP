@@ -6,9 +6,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version:  0.1\n"
 "Report-Msgid-Bugs-To: tomek@onyxcherry.pl\n"
-"POT-Creation-Date: 2020-07-06 17:37+0200\n"
+"POT-Creation-Date: 2020-07-07 10:12+0200\n"
 "PO-Revision-Date: 2020-06-21 10:53+0200\n"
 "Last-Translator: Tomasz Wiśniewski tomek@onyxcherry.pl\n"
 "Language: pl\n"
@@ -126,12 +126,12 @@ msgstr "Niepoprawny token!"
 msgid "Invalid OTP code"
 msgstr "Niepoprawny kod OTP"
 
-#: app/main/routes.py:13 app/templates/base.html:21
+#: app/main/routes.py:13 app/templates/base.html:22 app/templates/base.html:38
 msgid "Home"
 msgstr "Strona główna"
 
-#: app/main/routes.py:20 app/main/routes.py:21 app/templates/base.html:24
-#: app/templates/settings/settings.html:5
+#: app/main/routes.py:20 app/main/routes.py:21 app/templates/base.html:23
+#: app/templates/base.html:41 app/templates/settings/settings.html:5
 msgid "Settings"
 msgstr "Ustawienia"
 
@@ -139,11 +139,11 @@ msgstr "Ustawienia"
 msgid "Welcome to Onyxcherry OTP"
 msgstr "Witaj w serwisie Onyxcherry OTP"
 
-#: app/templates/base.html:26
+#: app/templates/base.html:43
 msgid "Login"
 msgstr "Zaloguj się"
 
-#: app/templates/base.html:28
+#: app/templates/base.html:45
 msgid "Logout"
 msgstr "Wyloguj się"
 
@@ -188,17 +188,57 @@ msgstr "Odnów sesję"
 msgid "Reset Your Password"
 msgstr "Zresetuj hasło"
 
-#: app/templates/auth/turn_on_2fa.html:15
+#: app/templates/auth/turn_on_2fa.html:17
 #: app/templates/settings/settings.html:9
 #: app/templates/settings/settings.html:16
 msgid "Turn on 2FA"
 msgstr "Włącz 2FA"
 
-#: app/templates/auth/turn_on_2fa.html:36
+#: app/templates/auth/turn_on_2fa.html:20
+msgid "You are activating two factor authentication."
+msgstr "Aktywujesz uwierzytelnianie dwuskładnikowe."
+
+#: app/templates/auth/turn_on_2fa.html:21
+msgid "Please keep the secret private."
+msgstr "Nie przekazuj tego kodu innym."
+
+#: app/templates/auth/turn_on_2fa.html:24
+msgid "Turned on 2FA."
+msgstr "Włączono uwierzytelnianie dwuskładnikowe."
+
+#: app/templates/auth/turn_on_2fa.html:25
+msgid "You could go to the main page."
+msgstr "Możesz przejść do strony głównej."
+
+#: app/templates/auth/turn_on_2fa.html:28
+msgid "Invalid OTP code!"
+msgstr "Niepoprawny kod!"
+
+#: app/templates/auth/turn_on_2fa.html:29
+msgid "Try again."
+msgstr "Spróbuj ponownie."
+
+#: app/templates/auth/turn_on_2fa.html:32
+msgid "An error occured."
+msgstr "Wystąpił błąd."
+
+#: app/templates/auth/turn_on_2fa.html:33
+msgid "Please contact the administrator."
+msgstr "Proszę skontaktować się z administratorem."
+
+#: app/templates/auth/turn_on_2fa.html:40
 msgid "Show secret as text"
 msgstr "Pokaż jako tekst"
 
-#: app/templates/auth/turn_on_2fa.html:45
+#: app/templates/auth/turn_on_2fa.html:41
+msgid "Show QR Code"
+msgstr "Pokaż kod QR"
+
+#: app/templates/auth/turn_on_2fa.html:43
+msgid "OTP code: "
+msgstr "Kod: "
+
+#: app/templates/auth/turn_on_2fa.html:50
 msgid "I understand"
 msgstr "Rozumiem"
 
