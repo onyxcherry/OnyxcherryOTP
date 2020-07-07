@@ -21,7 +21,6 @@ messages = {
     }
  }
 
-
 view_as_text_button = document.getElementById('viewAsText')
 view_as_qr_button = document.getElementById('viewAsQR')
 
@@ -75,7 +74,7 @@ function submitForm(e, form) {
         if (response.ok) {
             return response.text()
         } else {
-            errorDiv('rejecta reponse dostalem');
+            errorDiv();
             return Promise.reject(response)
         }
     }).then(response => {
@@ -89,7 +88,7 @@ function submitForm(e, form) {
             panel_danger.style.display = 'none'
         }
     }).catch(err => {
-        errorDiv('zlapalo blad')
+        errorDiv()
     });
 }
 
@@ -104,7 +103,7 @@ function getToken() {
             if (response.ok) {
                 return response.json()
             } else {
-                errorDiv('znowu reject');
+                errorDiv();
                 return Promise.reject(response)
             }
         })
@@ -114,7 +113,7 @@ function getToken() {
             if (response['app_qrcode']) {
                 var svgNode = QRCode(response['app_qrcode'])
             } else {
-                errorDiv('cos nie moze wyswietlic')
+                errorDiv()
             }
             if (response['secret']) {
                 panel_primary.innerText = response['secret']
@@ -128,6 +127,6 @@ function getToken() {
 
         })
         .catch(error => {
-            errorDiv('kolejny zlapany blad');
+            errorDiv();
         });
 }

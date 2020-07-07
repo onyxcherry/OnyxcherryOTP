@@ -16,20 +16,13 @@ class Config(object):
 
     MAIL_SERVER = os.environ.get('MAIL_SERVER')
     MAIL_PORT = int(os.environ.get('MAIL_PORT') or 465)
-    # MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is not None
-    # MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL') is not None
-    # MAIL_DEBUG = os.environ.get('MAIL_DEBUG')
-    # MAIL_SUPPRESS_SEND=False
-    
+
     if os.environ.get('MAIL_LOCALHOST') is not None:
         MAIL_SERVER = 'localhost'
         MAIL_PORT = '8465'
         os.environ['MAIL_SERVER'] = 'localhost'
         os.environ['MAIL_PORT'] = '8465'
-
-    # MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-    # MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
-    
+   
     ADMINS = ['postmaster@onyxcherry.pl']
 
     LANGUAGES = ['en', 'pl']

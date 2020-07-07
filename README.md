@@ -2,7 +2,7 @@
 ## Flask (Python) app with two-factor authentication based on time - [One-Time password](https://en.wikipedia.org/wiki/One-time_password).
 
 ### Features
-* Sign in, register panels
+* Sign in, register, reset password panels
 * Fresh login requirement to crucial operations
 * Reset password by email
 * Activate and deactivate 2FA
@@ -51,11 +51,10 @@ and change secrets in .env and in config.py to the generated above.
 OnyxcherryOTP uses SendGrid to sending emails. Set `MAIL_LOCALHOST=True` in the .env if you want to send emails to localhost. Type `python3 -m smtpd -n -c DebuggingServer localhost:8465` in another console window.
 
 ### TO-DO:
-* Add Captcha
-* Temporarily block user account due to security reasons (and sign in through email)
 * Add `revoke other sessions` button
+* Temporarily block user account due to security reasons (and sign in through email)
 * Add alternative way to 2FA authenticate (backup codes)
-* Deploy in production
+* Add custom front-end (panels)
 
 ### Credits:
 * [Miguel's incredible Flask tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world)
