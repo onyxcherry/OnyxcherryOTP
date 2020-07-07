@@ -89,7 +89,8 @@ def reset_password_request():
             elif not reset_password_db.second_value:
                 reset_password_db.second_value = value
                 reset_password_db.second_date = db_date
-            db.session.add(reset_password_db)
+            if reset_password_db: db.session.add(reset_password_db)
+            elif reset_password_new: db.session.add(reset_password_new)
             db.session.commit()
             send_password_reset_email(user, token)
         flash(_('Check your email for the instructions to reset your password.'))
@@ -233,3 +234,4 @@ def deactivate_2fa():
         db.session.commit()
         return render_template('auth/deactivated_2fa.html')
     return redirect(url_for('main.index'))
+

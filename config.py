@@ -24,6 +24,8 @@ class Config(object):
     if os.environ.get('MAIL_LOCALHOST') is not None:
         MAIL_SERVER = 'localhost'
         MAIL_PORT = '8465'
+        os.environ['MAIL_SERVER'] = 'localhost'
+        os.environ['MAIL_PORT'] = '8465'
 
     # MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     # MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')

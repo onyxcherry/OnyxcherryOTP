@@ -28,9 +28,7 @@ def send_email(subject, sender, sender_name, recipients, text_body, html_body):
     to_email = To(recipients)
     plain_text_content = Content("text/plain", text_body)
     html_content = Content("text/html", html_body)
-
     em = Mail(from_email, to_email, subject, html_content)
-
     asyncio.run(async_send_mail(em, sendgrid_client))
 
 async def async_send_mail(email, sendgrid_client):
