@@ -81,18 +81,25 @@ def reset_password_request():
             value = b64encode(os.urandom(16)).decode('utf-8')
             token = user.get_reset_password_token(value)
             db_date = datetime.utcnow()
+
+            should_send_mail = False
+
             if not reset_password_db:
                 reset_password_new = ResetPasswordValue(first_value=value, first_date=db_date, user_id=user.id)
+                should_send_mail = True
             elif not reset_password_db.first_value:         
                 reset_password_db.first_value = value
                 reset_password_db.first_date = db_date
+                should_send_mail = True
             elif not reset_password_db.second_value:
                 reset_password_db.second_value = value
                 reset_password_db.second_date = db_date
+                should_send_mail = True
             if reset_password_db: db.session.add(reset_password_db)
             elif reset_password_new: db.session.add(reset_password_new)
-            db.session.commit()
-            send_password_reset_email(user, token)
+            if should_send_mail:
+                db.session.commit()
+                send_password_reset_email(user, token)
         flash(_('Check your email for the instructions to reset your password.'))
         return redirect(url_for('auth.login'))
     return render_template('auth/reset_password_request.html', title=_('Reset Password'), form=form)
@@ -157,6 +164,7 @@ def refresh_login():
     return render_template('auth/refresh_login.html', title=_('Refresh your session'), form=form)
 
 @bp.route('/generate_token')
+@fresh_login_required
 def generate_token():
     if current_user.is_anonymous:
         abort(401)
@@ -181,6 +189,7 @@ def generate_token():
     return jsonify(resp)
 
 @bp.route('/checkcode', methods=['POST'])
+@fresh_login_required
 def checkcode():
     if current_user.is_anonymous:
         abort(401)

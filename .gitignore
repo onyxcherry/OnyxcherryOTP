@@ -7,3 +7,4 @@ app.db
 *:Zone.Identifier
 sort.py
 .env
+virtualenv
