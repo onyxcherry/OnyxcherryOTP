@@ -13,6 +13,7 @@ from flask import (
     render_template,
     request,
     url_for,
+    make_response,
 )
 from flask_babel import _
 from flask_login import (
@@ -63,9 +64,18 @@ def login():
         if onetimepass and onetimepass.is_valid == 1:
             form = TwoFALogin()
             token = user.set_valid_credentials(remember_me)
-            return render_template(
-                "auth/2fa_login.html", form=form, token=token
+            response = make_response(
+                render_template("auth/2fa_login.html", form=form)
             )
+            response.set_cookie(
+                "token",
+                value=token,
+                max_age=60,
+                secure=False,
+                httponly=True,
+                samesite="Strict",
+            )
+            return response
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get("next")
         if not next_page or url_parse(next_page).netloc != "":
@@ -266,7 +276,7 @@ def checkcode():
 
 @bp.route("/check_2fa_login", methods=["POST"])
 def check_2fa_login():
-    token = request.form.get("2fa_token")
+    token = request.cookies.get("token").encode()
     otp_code = request.form.get("otp_code")
     try:
         jwt_decoded = jwt.decode(
@@ -275,7 +285,10 @@ def check_2fa_login():
         jwt_username = jwt_decoded["twofa_login"]
         jwt_exp = jwt_decoded["exp"]
         jwt_remember_me = jwt_decoded["remember_me"]
-    except jwt.exceptions.InvalidSignatureError:
+    except (
+        jwt.exceptions.InvalidSignatureError,
+        jwt.exceptions.ExpiredSignatureError,
+    ):
         flash(_("Invalid token!"))
         return redirect(url_for("auth.login"))
     user = User.query.filter_by(username=jwt_username).first()

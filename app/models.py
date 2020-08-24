@@ -79,7 +79,10 @@ class User(UserMixin, db.Model):
             )
             username = jwt_decoded["reset_password"]
             value = jwt_decoded["value"]
-        except jwt.exceptions.InvalidSignatureError:
+        except (
+            jwt.exceptions.InvalidSignatureError,
+            jwt.exceptions.ExpiredSignatureError,
+        ):
             return
         return User.query.filter_by(username=username).first(), value
 
