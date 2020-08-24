@@ -10,7 +10,10 @@ def test_register_and_login(test_client, init_database):
         follow_redirects=True,
     )
 
-    assert b"Congratulations, you are now a registered user!" in register_response.data
+    assert (
+        b"Congratulations, you are now a registered user!"
+        in register_response.data
+    )
 
     login_response = test_client.post(
         "/auth/login",
@@ -18,4 +21,4 @@ def test_register_and_login(test_client, init_database):
         follow_redirects=True,
     )
     assert b"Hello, bob" in login_response.data
-    assert not b"Invalid username or password" in login_response.data
+    assert b"Invalid username or password" not in login_response.data

@@ -5,4 +5,4 @@ def test_login_without_2fa(test_client, init_database):
         follow_redirects=True,
     )
 
-    assert b'Hello, straw_berry' in login_response.data
+    assert b"Hello, straw_berry" in login_response.data

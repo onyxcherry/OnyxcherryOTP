@@ -269,4 +269,3 @@ msgstr "Administrator serwisu został powiadomiony. Przepraszamy za niedogodnoś
 #: app/templates/settings/settings.html:14
 msgid "Turn off 2FA"
 msgstr "Wyłącz 2FA"
-

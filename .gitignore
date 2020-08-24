@@ -5,6 +5,7 @@ onyxcherryotp.log*
 .vscode
 app.db
 *:Zone.Identifier
-sort.py
 .env
 virtualenv
+.tox
+*.egg-info

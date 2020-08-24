@@ -19,7 +19,7 @@ pyotp library allows to generate and check OTP at given time, e.g. for last 30 s
 ### Install
 1. Clone this repository
 ```bash
-git clone https://github.com/onyxcherry/OnyxcherryOTP.git 
+git clone https://github.com/onyxcherry/OnyxcherryOTP.git
 ```
 2. Create and activate python virtual environment
 ```bash

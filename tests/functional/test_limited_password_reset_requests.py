@@ -4,7 +4,9 @@ from app.models import User
 
 
 @mock.patch("app.auth.routes.send_password_reset_email")
-def test_limited_password_reset_requests(mocked_email, test_client, init_database):
+def test_limited_password_reset_requests(
+    mocked_email, test_client, init_database
+):
     tests_count = 7
     message = b"Check your email for the instructions to reset your password."
     for _ in range(tests_count):

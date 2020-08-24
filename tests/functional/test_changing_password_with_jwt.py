@@ -15,7 +15,7 @@ def test_changing_password_with_jwt(test_client, init_database):
     )
     init_database.session.add(reset_password_new)
     init_database.session.commit()
-    new_password = 'aabbccdd'
+    new_password = "aabbccdd"
     response = test_client.post(
         f"/auth/reset_password/{token}",
         data=dict(password=new_password, password2=new_password),
@@ -24,4 +24,4 @@ def test_changing_password_with_jwt(test_client, init_database):
 
     assert b"Your password has been reset." in response.data
     assert user.check_password(new_password)
-    assert not user.check_password('EJew@MHHQ7x-g.4<')
+    assert not user.check_password("EJew@MHHQ7x-g.4<")

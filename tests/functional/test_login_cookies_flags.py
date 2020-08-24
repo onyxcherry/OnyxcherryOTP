@@ -2,7 +2,8 @@ def test_cookie_security_flags(test_client, init_database):
     response = test_client.post(
         "/auth/login",
         data=dict(
-            username="josh_9", password="m7ZTbjQdwuUFU/Zy6la+k6uUtniBExIgEhmBPduKexM="
+            username="josh_9",
+            password="m7ZTbjQdwuUFU/Zy6la+k6uUtniBExIgEhmBPduKexM=",
         ),
         follow_redirects=False,
     )

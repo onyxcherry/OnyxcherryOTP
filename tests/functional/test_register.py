@@ -28,7 +28,10 @@ def test_short_password(test_client, init_database):
     response = test_client.post(
         "/auth/register",
         data=dict(
-            username="anything", email="josh@example.com", password="j", password2="j",
+            username="anything",
+            email="josh@example.com",
+            password="j",
+            password2="j",
         ),
     )
     assert b"Field must be" in response.data
@@ -55,4 +58,3 @@ def test_login_taken_username(test_client, init_database):
         follow_redirects=True,
     )
     assert b"Invalid username or password" in response.data
-
