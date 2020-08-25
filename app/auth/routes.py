@@ -62,6 +62,9 @@ def login():
         onetimepass = OTP.query.filter_by(user_id=user.id).first()
         remember_me = form.remember_me.data
         if onetimepass and onetimepass.is_valid == 1:
+            onetimepass.remaining_attempts = 3
+            db.session.add(onetimepass)
+
             form = TwoFALogin()
             token = user.set_valid_credentials(remember_me)
             response = make_response(
@@ -75,6 +78,7 @@ def login():
                 httponly=True,
                 samesite="Strict",
             )
+            db.session.commit()
             return response
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get("next")
@@ -297,7 +301,10 @@ def check_2fa_login():
         return redirect(url_for("auth.login"))
     user = User.query.filter_by(username=jwt_username).first()
     user_id = user.id
-    otp_secret_database = OTP.query.filter_by(user_id=user_id).first().secret
+    otp = OTP.query.filter_by(user_id=user_id).first()
+    if otp.remaining_attempts < 1:
+        abort(401)
+    otp_secret_database = otp.secret
     latest = pyotp.TOTP(otp_secret_database).verify(otp_code)
     previous = (
         pyotp.TOTP(otp_secret_database).at(
@@ -311,6 +318,9 @@ def check_2fa_login():
         if not next_page or url_parse(next_page).netloc != "":
             next_page = url_for("main.index")
         return redirect(next_page)
+    otp.remaining_attempts -= 1
+    db.session.add(otp)
+    db.session.commit()
     flash(_("Invalid OTP code"))
     return redirect(url_for("auth.login"))
 
