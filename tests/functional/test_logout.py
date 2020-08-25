@@ -1,5 +1,5 @@
 def test_logout(test_client, init_database):
-    login_response = test_client.post(
+    test_client.post(
         "/auth/login",
         data=dict(username="straw_berry", password="EJew@MHHQ7x-g.4<"),
         follow_redirects=False,

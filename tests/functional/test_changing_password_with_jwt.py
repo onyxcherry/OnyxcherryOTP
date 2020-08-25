@@ -5,7 +5,6 @@ from app.models import User, ResetPasswordValue
 
 
 def test_changing_password_with_jwt(test_client, init_database):
-    username = "straw_berry"
     user = User.query.filter_by(username="straw_berry").first()
     value = b64encode(os.urandom(16)).decode("utf-8")
     token = user.get_reset_password_token(value)
