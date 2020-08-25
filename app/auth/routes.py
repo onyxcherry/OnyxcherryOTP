@@ -276,7 +276,11 @@ def checkcode():
 
 @bp.route("/check_2fa_login", methods=["POST"])
 def check_2fa_login():
-    token = request.cookies.get("token").encode()
+    token = request.cookies.get("token")
+    if token:
+        token = token.encode()
+    else:
+        abort(401)
     otp_code = request.form.get("otp_code")
     try:
         jwt_decoded = jwt.decode(

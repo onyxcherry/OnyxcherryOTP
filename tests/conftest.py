@@ -4,6 +4,10 @@ from app import create_app, db
 import pytest
 
 
+import json
+import pyotp
+
+
 class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite://"
@@ -42,8 +46,11 @@ def init_database():
     user1.set_password("EJew@MHHQ7x-g.4<")
     user2 = User(username="josh_9", email="josh+otpapp@gmail.com")
     user2.set_password("m7ZTbjQdwuUFU/Zy6la+k6uUtniBExIgEhmBPduKexM=")
+    user3 = User(username="dave", email="dave16@outlook.com")
+    user3.set_password("wselfknskjdksdaiujlj")
     db.session.add(user1)
     db.session.add(user2)
+    db.session.add(user3)
 
     db.session.commit()
 
