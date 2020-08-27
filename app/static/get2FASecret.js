@@ -1,6 +1,6 @@
 const userLang = window.navigator.language.split('-')[0]
 
-const base_url = 'http://127.0.0.1:5777'
+const base_url = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`
 
 const panel_info = document.querySelector('.panel-info')
 const panel_danger = document.querySelector('.panel-danger')
