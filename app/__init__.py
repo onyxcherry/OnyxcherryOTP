@@ -6,11 +6,12 @@ from flask_bootstrap import Bootstrap
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 from config import Config
 
 db = SQLAlchemy()
-
+migrate = Migrate()
 login = LoginManager()
 login.login_view = "auth.login"
 login.login_message = _l("Please log in to access this page.")
@@ -38,6 +39,11 @@ def create_app(config_class=Config):
     mail.init_app(app)
     bootstrap.init_app(app)
     babel.init_app(app)
+    with app.app_context():
+        if db.engine.url.drivername == "sqlite":
+            migrate.init_app(app, db, render_as_batch=True)
+        else:
+            migrate.init_app(app, db)
 
     from app.errors import bp as errors_bp
 
