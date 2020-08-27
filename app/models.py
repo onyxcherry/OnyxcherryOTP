@@ -97,6 +97,7 @@ class OTP(db.Model):
         db.Integer, default=0
     )  # change to d.Boolean if database supports booleans
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    remaining_attempts = db.Column(db.Integer)
 
     def __repr__(self):
         return f"<OTP {self.secret}>"

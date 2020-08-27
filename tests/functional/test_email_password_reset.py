@@ -6,7 +6,7 @@ import os
 from flask import current_app
 
 
-@mock.patch("app.email.send_async_email")
+@mock.patch("app.auth.email.send_email")
 def test_password_reset(mocked_email, test_client, init_database):
     user = User.query.filter_by(email="strawberry8@example.com").first()
     value = b64encode(os.urandom(16)).decode("utf-8")
