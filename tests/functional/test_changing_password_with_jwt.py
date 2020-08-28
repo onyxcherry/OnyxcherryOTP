@@ -1,7 +1,8 @@
 import os
 from base64 import b64encode
 from datetime import datetime
-from app.models import User, ResetPasswordValue
+
+from app.models import ResetPasswordValue, User
 
 
 def test_changing_password_with_jwt(test_client, init_database):

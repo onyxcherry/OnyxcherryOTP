@@ -1,4 +1,4 @@
-from helping import sign_in_remember, refresh_session_fr
+from helping import refresh_session_fr, sign_in_remember
 
 
 def test_activating_2fa_non_fresh_session_invalid_password(

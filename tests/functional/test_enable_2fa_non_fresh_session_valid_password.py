@@ -1,7 +1,7 @@
 import json
-import pyotp
 
-from helping import sign_in_remember, refresh_session, enable_user_2fa
+import pyotp
+from helping import enable_user_2fa, refresh_session, sign_in_remember
 
 
 def test_activating_2fa_non_fresh_session_valid_password(

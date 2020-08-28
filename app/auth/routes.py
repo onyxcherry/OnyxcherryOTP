@@ -4,29 +4,6 @@ from datetime import datetime, timedelta
 
 import jwt
 import pyotp
-from flask import (
-    abort,
-    current_app,
-    flash,
-    jsonify,
-    redirect,
-    render_template,
-    request,
-    url_for,
-    make_response,
-)
-from flask_babel import _
-from flask_login import (
-    confirm_login,
-    current_user,
-    fresh_login_required,
-    login_fresh,
-    login_required,
-    login_user,
-    logout_user,
-)
-from werkzeug.urls import url_parse
-
 from app import db
 from app.auth import bp
 from app.auth.email import send_password_reset_email
@@ -40,6 +17,28 @@ from app.auth.forms import (
     TwoFALogin,
 )
 from app.models import OTP, ResetPasswordValue, User
+from flask import (
+    abort,
+    current_app,
+    flash,
+    jsonify,
+    make_response,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from flask_babel import _
+from flask_login import (
+    confirm_login,
+    current_user,
+    fresh_login_required,
+    login_fresh,
+    login_required,
+    login_user,
+    logout_user,
+)
+from werkzeug.urls import url_parse
 
 
 @bp.route("/")

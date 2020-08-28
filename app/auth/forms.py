@@ -1,3 +1,4 @@
+from app.models import User
 from flask_babel import _
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm, RecaptchaField
@@ -6,11 +7,9 @@ from wtforms.validators import (
     DataRequired,
     Email,
     EqualTo,
-    ValidationError,
     Length,
+    ValidationError,
 )
-
-from app.models import User
 
 
 class LoginForm(FlaskForm):

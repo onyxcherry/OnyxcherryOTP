@@ -1,5 +1,4 @@
 import pyotp
-
 from helping import (
     delete_session_cookie,
     enable_user_2fa,

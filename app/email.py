@@ -2,12 +2,11 @@ import asyncio
 import os
 from threading import Thread
 
+from app import mail
 from flask import current_app
 from flask_mail import Message
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Content, From, Mail, To
-
-from app import mail
 
 
 def send_async_email(app, msg):

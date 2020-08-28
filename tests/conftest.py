@@ -1,12 +1,11 @@
-from app.models import User
-from app import Config
-from app import create_app, db
-import pytest
 import datetime
+import json
 import os
 
-import json
 import pyotp
+import pytest
+from app import Config, create_app, db
+from app.models import User
 
 
 class TestConfig(Config):

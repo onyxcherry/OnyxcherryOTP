@@ -1,11 +1,10 @@
-from helping import (
-    sign_in,
-    enable_user_2fa,
-    delete_session_cookie,
-    send_otp_code,
-)
-
 import pyotp
+from helping import (
+    delete_session_cookie,
+    enable_user_2fa,
+    send_otp_code,
+    sign_in,
+)
 
 
 def test_bruteforce_otp_code(test_client, init_database):

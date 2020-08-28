@@ -1,3 +1,4 @@
+from config import Config
 from flask import Flask, current_app, request
 from flask_babel import Babel
 from flask_babel import lazy_gettext as _l
@@ -5,10 +6,8 @@ from flask_bcrypt import Bcrypt
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager
 from flask_mail import Mail
-from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-
-from config import Config
+from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 migrate = Migrate()

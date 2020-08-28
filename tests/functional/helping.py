@@ -1,5 +1,6 @@
-import pyotp
 import json
+
+import pyotp
 
 
 def enable_user_2fa(test_client):

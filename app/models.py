@@ -3,10 +3,9 @@ from time import time
 
 import jwt
 import pyotp
+from app import bcrypt, db, login
 from flask import current_app
 from flask_login import UserMixin
-
-from app import bcrypt, db, login
 
 
 class User(UserMixin, db.Model):

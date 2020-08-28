@@ -1,9 +1,8 @@
+from app.main import bp
+from app.models import OTP
 from flask import flash, redirect, render_template, url_for
 from flask_babel import _
 from flask_login import current_user, login_required
-
-from app.main import bp
-from app.models import OTP
 
 
 @bp.route("/")

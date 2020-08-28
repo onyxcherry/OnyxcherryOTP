@@ -1,8 +1,9 @@
-from app.auth.email import send_password_reset_email
-from unittest import mock
-from base64 import b64encode
-from app.models import User
 import os
+from base64 import b64encode
+from unittest import mock
+
+from app.auth.email import send_password_reset_email
+from app.models import User
 from flask import current_app
 
 
