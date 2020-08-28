@@ -16,20 +16,6 @@ class TestConfig(Config):
     WTF_CSRF_ENABLED = False
     SECRET_KEY = "s2yvxuwZ7Ipf5JKv6uV7y85AfJJdhhSPq65bKZtH7l4="
     TWOFA_SECRET_KEY = "cryG2D0C95mlO9r/rnple7FOdQhYsPL8boXB/qOXuPM="
-    ADMINS = ["postmaster@onyxcherry.pl"]
-    LANGUAGES = ["en", "pl"]
-
-    SESSION_COOKIE_SECURE = False  # change to True in production
-    SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = "Strict"
-
-    REMEMBER_COOKIE_DURATION = datetime.timedelta(days=1)
-    REMEMBER_COOKIE_SECURE = False  # change to True in production
-    REMEMBER_COOKIE_HTTPONLY = True
-    REMEMBER_COOKIE_SAMESITE = "Strict"  # might not implented yet
-
-    RECAPTCHA_PUBLIC_KEY = os.environ.get("RECAPTCHA_PUBLIC_KEY")
-    RECAPTCHA_PRIVATE_KEY = os.environ.get("RECAPTCHA_PRIVATE_KEY")
 
 
 @pytest.fixture(scope="session")

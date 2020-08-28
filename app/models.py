@@ -94,8 +94,8 @@ class OTP(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     secret = db.Column(db.String(32))
     is_valid = db.Column(
-        db.Integer, default=0
-    )  # change to d.Boolean if database supports booleans
+        db.Boolean, default=False
+    )  # change to db.Boolean if database supports booleans
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     remaining_attempts = db.Column(db.Integer)
 
