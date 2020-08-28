@@ -6,7 +6,7 @@ from flask_babel import _
 def send_password_reset_email(user, token):
     send_email(
         _("[Onyxcherry OTP] Reset Your Password"),
-        sender=current_app.config["ADMINS"][0],
+        sender_email=current_app.config["ADMINS"][0],
         sender_name="OnyxcherryOTP",
         recipients=[user.email],
         text_body=render_template(

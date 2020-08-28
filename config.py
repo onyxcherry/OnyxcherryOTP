@@ -1,4 +1,5 @@
 import datetime
+import logging
 import os
 
 from dotenv import load_dotenv
@@ -53,3 +54,16 @@ class Config(object):
 
     # Very useful when debugging especially templates. Change to True if needed
     EXPLAIN_TEMPLATE_LOADING = False
+
+
+def setup_logger(name, log_file, level=logging.INFO):
+    formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
+
+    handler = logging.FileHandler(log_file)
+    handler.setFormatter(formatter)
+
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    logger.addHandler(handler)
+
+    return logger

@@ -16,7 +16,7 @@ def index():
 @login_required
 def settings():
     user_twofa = OTP.query.filter_by(user_id=current_user.get_id()).first()
-    if user_twofa and user_twofa.is_valid == 1:
+    if user_twofa and user_twofa.is_valid is True:
         return render_template(
             "settings/settings.html", title=_("Settings"), twofa_enabled=True
         )

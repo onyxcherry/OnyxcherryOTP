@@ -1,7 +1,7 @@
 *.py[cod]
 __pycache__
 venv
-onyxcherryotp.log*
+*.log*
 .vscode
 app.db
 *:Zone.Identifier
@@ -9,3 +9,5 @@ app.db
 virtualenv
 .tox
 *.egg-info
+.coverage
+htmlcov
