@@ -16,7 +16,7 @@ from app.auth.forms import (
     ResetPasswordRequestForm,
     TwoFALogin,
 )
-from app.models import OTP, ResetPasswordValue, User
+from app.models import OTP, ResetPassword, User
 from flask import (
     abort,
     current_app,
@@ -41,6 +41,13 @@ from flask_login import (
 from werkzeug.urls import url_parse
 
 
+def get_next_page(next_from_request: str) -> str:
+    next_page = next_from_request
+    if not next_page or url_parse(next_page).netloc != "":
+        next_page = url_for("main.index")
+    return next_page
+
+
 @bp.route("/")
 def root():
     if current_user.is_authenticated:
@@ -58,11 +65,11 @@ def login():
         if user is None or not user.check_password(form.password.data):
             flash(_("Invalid username or password"))
             return redirect(url_for("auth.login"))
-        onetimepass = OTP.query.filter_by(user_id=user.id).first()
+        user_otp = OTP.query.filter_by(user_id=user.id).first()
         remember_me = form.remember_me.data
-        if onetimepass and onetimepass.is_valid == 1:
-            onetimepass.remaining_attempts = 3
-            db.session.add(onetimepass)
+        if user_otp and user_otp.is_valid == 1:
+            user_otp.remaining_attempts = 3
+            db.session.add(user_otp)
 
             form = TwoFALogin()
             token = user.set_valid_credentials(remember_me)
@@ -80,9 +87,7 @@ def login():
             db.session.commit()
             return response
         login_user(user, remember=form.remember_me.data)
-        next_page = request.args.get("next")
-        if not next_page or url_parse(next_page).netloc != "":
-            next_page = url_for("main.index")
+        next_page = get_next_page(request.args.get("next"))
         return redirect(next_page)
     return render_template("auth/login.html", title=_("Sign In"), form=form)
 
@@ -99,9 +104,9 @@ def register():
         return redirect(url_for("main.index"))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
+        new_user = User(username=form.username.data, email=form.email.data)
+        new_user.set_password(form.password.data)
+        db.session.add(new_user)
         db.session.commit()
         flash(_("Congratulations, you are now a registered user!"))
         return redirect(url_for("auth.login"))
@@ -117,38 +122,42 @@ def reset_password_request():
     form = ResetPasswordRequestForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user:
-            reset_password_db = ResetPasswordValue.query.filter_by(
-                user_id=user.id
-            ).first()
-            if reset_password_db:
-                user.delete_expired_tokens(reset_password_db)
-            value = b64encode(os.urandom(16)).decode("utf-8")
-            token = user.get_reset_password_token(value)
-            db_date = datetime.utcnow()
-
-            should_send_mail = False
-
-            if not reset_password_db:
-                reset_password_new = ResetPasswordValue(
-                    first_value=value, first_date=db_date, user_id=user.id
+        if not user:
+            flash(
+                _(
+                    "Check your email for the instructions "
+                    "to reset your password."
                 )
+            )
+            return redirect(url_for("auth.login"))
+
+        confirming_value = user.get_random_base64_value()
+        token = user.get_reset_password_token(confirming_value)
+        now = datetime.utcnow()
+        should_send_mail = False
+
+        reset_password = ResetPassword.query.filter_by(user_id=user.id).first()
+        if reset_password:
+            user.delete_expired_tokens(reset_password)
+            if not reset_password.first_value:
+                reset_password.first_value = confirming_value
+                reset_password.first_date = now
                 should_send_mail = True
-            elif not reset_password_db.first_value:
-                reset_password_db.first_value = value
-                reset_password_db.first_date = db_date
+            elif not reset_password.second_value:
+                reset_password.second_value = confirming_value
+                reset_password.second_date = now
                 should_send_mail = True
-            elif not reset_password_db.second_value:
-                reset_password_db.second_value = value
-                reset_password_db.second_date = db_date
-                should_send_mail = True
-            if reset_password_db:
-                db.session.add(reset_password_db)
-            elif reset_password_new:
-                db.session.add(reset_password_new)
-            if should_send_mail:
-                db.session.commit()
-                send_password_reset_email(user, token)
+            db.session.add(reset_password)
+        else:
+            reset_password_new = ResetPassword(
+                first_value=confirming_value, first_date=now, user_id=user.id
+            )
+            db.session.add(reset_password_new)
+            should_send_mail = True
+        db.session.commit()
+        if should_send_mail:
+            send_password_reset_email(user, token)
+
         flash(
             _("Check your email for the instructions to reset your password.")
         )
@@ -167,9 +176,7 @@ def reset_password(token):
     user, value = User.verify_reset_password_token(token)
     if not user:
         return redirect(url_for("main.index"))
-    reset_password_db = ResetPasswordValue.query.filter_by(
-        user_id=user.id
-    ).first()
+    reset_password_db = ResetPassword.query.filter_by(user_id=user.id).first()
     if reset_password_db:
         user.delete_expired_tokens(reset_password_db)
     form = ResetPasswordForm()

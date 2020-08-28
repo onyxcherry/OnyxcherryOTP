@@ -7,10 +7,10 @@ exclude = '''
   | \.mypy_cache
   | \.tox
   | \.pytest_cache
-  | venv
-  | virtualenv
-  | migrations
-  | versions
+  | venv/
+  | virtualenv/
+  | migrations/
+  | versions/
 )/
 '''
 

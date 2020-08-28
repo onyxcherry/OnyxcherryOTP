@@ -2,7 +2,7 @@ import os
 from base64 import b64encode
 from datetime import datetime
 
-from app.models import ResetPasswordValue, User
+from app.models import ResetPassword, User
 
 
 def test_changing_password_with_jwt(test_client, init_database):
@@ -10,7 +10,7 @@ def test_changing_password_with_jwt(test_client, init_database):
     value = b64encode(os.urandom(16)).decode("utf-8")
     token = user.get_reset_password_token(value)
     db_date = datetime.utcnow()
-    reset_password_new = ResetPasswordValue(
+    reset_password_new = ResetPassword(
         first_value=value, first_date=db_date, user_id=user.id
     )
     init_database.session.add(reset_password_new)

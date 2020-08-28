@@ -1,3 +1,5 @@
+import os
+from base64 import b64encode
 from datetime import datetime, timedelta
 from time import time
 
@@ -15,7 +17,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     otp = db.relationship("OTP", backref="user", uselist=False)
     reset_password_value = db.relationship(
-        "ResetPasswordValue", backref="user", uselist=False
+        "ResetPassword", backref="user", uselist=False
     )
 
     def __repr__(self):
@@ -52,23 +54,27 @@ class User(UserMixin, db.Model):
         ).decode("utf-8")
 
     @staticmethod
-    def delete_expired_tokens(reset_password_db):
+    def get_random_base64_value():
+        return b64encode(os.urandom(16)).decode("utf-8")
+
+    @staticmethod
+    def delete_expired_tokens(reset_password: object):
         now_compare_time = datetime.utcnow() - timedelta(seconds=600)
         if (
-            reset_password_db.first_date
-            and reset_password_db.first_date < now_compare_time
+            reset_password.first_date
+            and reset_password.first_date < now_compare_time
         ):
-            reset_password_db.first_value = None
-            reset_password_db.first_date = None
-            db.session.add(reset_password_db)
+            reset_password.first_value = None
+            reset_password.first_date = None
+            db.session.add(reset_password)
             db.session.commit()
         if (
-            reset_password_db.second_date
-            and reset_password_db.second_date < now_compare_time
+            reset_password.second_date
+            and reset_password.second_date < now_compare_time
         ):
-            reset_password_db.second_value = None
-            reset_password_db.second_date = None
-            db.session.add(reset_password_db)
+            reset_password.second_value = None
+            reset_password.second_date = None
+            db.session.add(reset_password)
             db.session.commit()
         return
 
@@ -102,8 +108,8 @@ class OTP(db.Model):
         return f"<OTP {self.secret}>"
 
 
-class ResetPasswordValue(db.Model):
-    __tablename__ = "reset_password_value"
+class ResetPassword(db.Model):
+    __tablename__ = "reset_password"
     id = db.Column(db.Integer, primary_key=True)
     first_value = db.Column(db.String(32))
     first_date = db.Column(db.DateTime)
