@@ -9,5 +9,6 @@ def test_reset_password_requests_token(test_client, init_database):
     user = User(username=username)
     value = b64encode(os.urandom(16)).decode("utf-8")
     token = user.get_reset_password_token(value)
-    user_instance, _ = user.verify_reset_password_token(token)
-    assert user_instance.username == username
+    username, _ = user.verify_reset_password_token(token)
+    user = User.query.filter_by(username=username)
+    assert user is not None

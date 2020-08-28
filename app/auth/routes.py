@@ -48,6 +48,10 @@ def get_next_page(next_from_request: str) -> str:
     return next_page
 
 
+def generate_base32_secret():
+    return pyotp.random_base32()
+
+
 @bp.route("/")
 def root():
     if current_user.is_authenticated:
@@ -173,26 +177,28 @@ def reset_password_request():
 def reset_password(token):
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
-    user, value = User.verify_reset_password_token(token)
+    username, value = User.verify_reset_password_token(token)
+    user = User.query.filter_by(username=username).first()
     if not user:
         return redirect(url_for("main.index"))
-    reset_password_db = ResetPassword.query.filter_by(user_id=user.id).first()
-    if reset_password_db:
-        user.delete_expired_tokens(reset_password_db)
+    reset_password = ResetPassword.query.filter_by(user_id=user.id).first()
+    if reset_password:
+        user.delete_expired_tokens(reset_password)
     form = ResetPasswordForm()
     if form.validate_on_submit():
-        if value == reset_password_db.first_value:
-            reset_password_db.first_value = None
-            reset_password_db.first_date = None
-            user.set_password(form.password.data)
-        elif value == reset_password_db.second_value:
-            reset_password_db.second_value = None
-            reset_password_db.second_date = None
-            user.set_password(form.password.data)
+        password = form.password.data
+        if value == reset_password.first_value:
+            reset_password.first_value = None
+            reset_password.first_date = None
+            user.set_password(password)
+        elif value == reset_password.second_value:
+            reset_password.second_value = None
+            reset_password.second_date = None
+            user.set_password(password)
         else:
             flash(_("Invalid or expired token"))
             return redirect(url_for("auth.reset_password_request"))
-        db.session.add(reset_password_db)
+        db.session.add(reset_password)
         db.session.add(user)
         db.session.commit()
         flash(_("Your password has been reset."))
@@ -212,9 +218,7 @@ def twofa():
 @login_required
 def refresh_login():
     if current_user.is_authenticated and login_fresh():
-        next_page = request.args.get("next")
-        if not next_page or url_parse(next_page).netloc != "":
-            next_page = url_for("main.index")
+        next_page = get_next_page(request.args.get("next"))
         return redirect(next_page)
     form = RefreshLogin()
     user = User.query.filter_by(id=current_user.get_id()).first()
@@ -224,9 +228,7 @@ def refresh_login():
         else:
             flash(_("Invalid password"))
             return redirect(url_for("auth.refresh_login"))
-        next_page = request.args.get("next")
-        if not next_page or url_parse(next_page).netloc != "":
-            next_page = url_for("main.index")
+        next_page = get_next_page(request.args.get("next"))
         return redirect(next_page)
     return render_template(
         "auth/refresh_login.html", title=_("Refresh your session"), form=form
@@ -238,29 +240,35 @@ def refresh_login():
 def generate_token():
     if current_user.is_anonymous:
         abort(401)
-    user_otp = OTP.query.filter_by(user_id=current_user.get_id()).first()
-    if not user_otp:
-        onetimepass = OTP(
-            secret=pyotp.random_base32(),
+    otp = OTP.query.filter_by(user_id=current_user.get_id()).first()
+    if not otp:
+        new_otp = OTP(
+            secret=generate_base32_secret(),
             is_valid=False,
             user_id=current_user.get_id(),
         )
-        db.session.add(onetimepass)
+        db.session.add(new_otp)
         db.session.commit()
-    elif user_otp.is_valid is False:
-        user_otp.secret = pyotp.random_base32()
-        db.session.add(user_otp)
+    elif otp.is_valid is False:
+        otp.secret = generate_base32_secret()
+        db.session.add(otp)
         db.session.commit()
-    otp_secret = (
+    current_otp_secret = (
         OTP.query.filter_by(user_id=current_user.get_id()).first().secret
     )
     user = User.query.filter_by(id=current_user.get_id()).first()
-    app_qrcode = pyotp.totp.TOTP(otp_secret).provisioning_uri(
+    app_qrcode_source = pyotp.totp.TOTP(current_otp_secret).provisioning_uri(
         name=user.email, issuer_name="Onyxcherry OTP"
     )
+
     status = "OK"
-    resp = {"status": status, "secret": otp_secret, "app_qrcode": app_qrcode}
-    return jsonify(resp)
+    # Verify the reason of returnning status
+    response = {
+        "status": status,
+        "secret": current_otp_secret,
+        "app_qrcode": app_qrcode_source,
+    }
+    return jsonify(response)
 
 
 @bp.route("/checkcode", methods=["POST"])

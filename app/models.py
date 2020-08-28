@@ -2,6 +2,7 @@ import os
 from base64 import b64encode
 from datetime import datetime, timedelta
 from time import time
+from typing import Tuple
 
 import jwt
 import pyotp
@@ -79,7 +80,7 @@ class User(UserMixin, db.Model):
         return
 
     @staticmethod
-    def verify_reset_password_token(token):
+    def verify_reset_password_token(token: str) -> Tuple[str, str]:
         try:
             jwt_decoded = jwt.decode(
                 token, current_app.config["SECRET_KEY"], algorithms=["HS256"]
@@ -91,7 +92,7 @@ class User(UserMixin, db.Model):
             jwt.exceptions.ExpiredSignatureError,
         ):
             return
-        return User.query.filter_by(username=username).first(), value
+        return (username, value)
 
 
 class OTP(db.Model):
