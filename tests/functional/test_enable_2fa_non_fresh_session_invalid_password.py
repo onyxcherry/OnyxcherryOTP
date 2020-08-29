@@ -1,17 +1,20 @@
-from helping import refresh_session_fr, sign_in_remember
+from helping import (
+    activate_2fa,
+    generate_token,
+    refresh_session_fr,
+    sign_in_remember,
+)
 
 
 def test_activating_2fa_non_fresh_session_invalid_password(
     test_client, init_database
 ):
-    _ = sign_in_remember(
+    sign_in_remember(
         test_client, "josh_9", "m7ZTbjQdwuUFU/Zy6la+k6uUtniBExIgEhmBPduKexM="
     )
     test_client.delete_cookie(server_name="localhost", key="session")
     temporary_request = test_client.get("/settings", follow_redirects=True)
-    refresh_response = test_client.get(
-        "/twofa/activate", follow_redirects=True
-    )
+    refresh_response = activate_2fa(test_client)
     assert (
         b"To protect your account, please reauthenticate to access this page."
         in refresh_response.data
@@ -21,9 +24,7 @@ def test_activating_2fa_non_fresh_session_invalid_password(
     )
     assert b"Invalid password" in refreshing_password_response.data
 
-    generate_token_response = test_client.get(
-        "/twofa/generate_token", follow_redirects=True
-    )
+    generate_token_response = generate_token(test_client)
     assert (
         b"To protect your account, please reauthenticate to access this page."
         in generate_token_response.data

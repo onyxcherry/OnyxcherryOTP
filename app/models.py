@@ -93,6 +93,23 @@ class User(UserMixin, db.Model):
             return
         return (username, value)
 
+    @staticmethod
+    def verify_twofa_login_token(token: bytes) -> Tuple[str, str]:
+        try:
+            jwt_decoded = jwt.decode(
+                token,
+                current_app.config["TWOFA_SECRET_KEY"],
+                algorithms=["HS256"],
+            )
+            username = jwt_decoded["twofa_login"]
+            remember_me = jwt_decoded["remember_me"]
+        except (
+            jwt.exceptions.InvalidSignatureError,
+            jwt.exceptions.ExpiredSignatureError,
+        ):
+            return None
+        return (username, remember_me)
+
 
 class OTP(db.Model):
     __tablename__ = "otp"

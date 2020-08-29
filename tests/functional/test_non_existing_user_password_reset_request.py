@@ -1,16 +1,15 @@
 from unittest import mock
 
 from app.models import User
+from helping import reset_password_request
 
 
 @mock.patch("app.auth.routes.send_password_reset_email")
 def test_non_existing_user_password_reset_request(
     mocked_send_email, test_client, init_database
 ):
-    response = test_client.post(
-        "/auth/reset_password_request",
-        data=dict(email="non_existing_email_address@example.com"),
-        follow_redirects=True,
+    response = reset_password_request(
+        test_client, "non_existing_email_address@example.com"
     )
 
     assert (

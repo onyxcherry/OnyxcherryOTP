@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Tuple
 
 import jwt
 import pyotp
@@ -86,62 +87,54 @@ def generate_token():
 def checkcode():
     if current_user.is_anonymous:
         abort(401)
-    otp_data = OTP.query.filter_by(user_id=current_user.get_id()).first()
-    if otp_data.is_valid == 1:
+    user_otp = OTP.query.filter_by(user_id=current_user.get_id()).first()
+    if user_otp.is_valid == 1:
         return "2FA is enabled."
-    latest = pyotp.TOTP(otp_data.secret).verify(request.data.decode())
+    latest = pyotp.TOTP(user_otp.secret).verify(request.data.decode())
     previous = (
-        pyotp.TOTP(otp_data.secret).at(datetime.now() - timedelta(seconds=30))
+        pyotp.TOTP(user_otp.secret).at(datetime.now() - timedelta(seconds=30))
         == request.data.decode()
     )
-    if (latest or previous) and otp_data.is_valid == 0:  # False
-        otp_data.is_valid = 1
-        db.session.add(otp_data)
+    if (latest or previous) and user_otp.is_valid is False:
+        user_otp.is_valid = 1
+        db.session.add(user_otp)
         db.session.commit()
         return "OK"
     return "NOT"
 
 
+def check_last_otp_code(secret: str, code: str) -> bool:
+    return pyotp.TOTP(secret).verify(code)
+
+
+def check_prior_latest_otp_code(secret: str, code: str) -> bool:
+    return (
+        pyotp.TOTP(secret).at(datetime.now() - timedelta(seconds=30)) == code
+    )
+
+
 @bp.route("/check_login", methods=["POST"])
 def check_login():
-    token = request.cookies.get("token")
-    if token:
-        token = token.encode()
-    else:
-        abort(401)
     otp_code = request.form.get("otp_code")
-    try:
-        jwt_decoded = jwt.decode(
-            token, current_app.config["TWOFA_SECRET_KEY"], algorithms=["HS256"]
-        )
-        jwt_username = jwt_decoded["twofa_login"]
-        jwt_decoded["exp"]
-        jwt_remember_me = jwt_decoded["remember_me"]
-    except (
-        jwt.exceptions.InvalidSignatureError,
-        jwt.exceptions.ExpiredSignatureError,
-    ):
+    token = request.cookies.get("token")
+    if not token:
+        abort(401)
+    username, remember_me = User.verify_twofa_login_token(token.encode())
+    if not username:
         flash(_("Invalid token!"))
         return redirect(url_for("auth.login"))
-    user = User.query.filter_by(username=jwt_username).first()
-    user_id = user.id
-    otp = OTP.query.filter_by(user_id=user_id).first()
+    user = User.query.filter_by(username=username).first()
+    otp = OTP.query.filter_by(user_id=user.id).first()
     if otp.remaining_attempts < 1:
         abort(401)
-    otp_secret_database = otp.secret
-    latest = pyotp.TOTP(otp_secret_database).verify(otp_code)
-    previous = (
-        pyotp.TOTP(otp_secret_database).at(
-            datetime.now() - timedelta(seconds=30)
-        )
-        == otp_code
-    )
-    if latest or previous:
-        login_user(user, remember=jwt_remember_me)
-        next_page = request.args.get("next")
-        if not next_page or url_parse(next_page).netloc != "":
-            next_page = url_for("main.index")
+    latest = check_last_otp_code(otp.secret, otp_code)
+    prior_latest = check_prior_latest_otp_code(otp.secret, otp_code)
+    if latest or prior_latest:
+        login_user(user, remember=remember_me)
+        next_page = get_next_page(request.args.get("next"))
         return redirect(next_page)
+    # regardless of the correctness of the token, the remaining number
+    # of attempts should decrease
     otp.remaining_attempts -= 1
     db.session.add(otp)
     db.session.commit()

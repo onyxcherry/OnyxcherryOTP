@@ -16,10 +16,10 @@ def generate_otp_token_at(otp_token, seconds):
 
 
 def test_login_with_2fa_enabled(test_client, init_database):
-    _ = sign_in(test_client, "dave", "wselfknskjdksdaiujlj")
+    sign_in(test_client, "dave", "wselfknskjdksdaiujlj")
     otp_token = enable_user_2fa(test_client)
     delete_session_cookie(test_client)
-    _ = sign_in(test_client, "dave", "wselfknskjdksdaiujlj")
+    sign_in(test_client, "dave", "wselfknskjdksdaiujlj")
     assert (
         b"Please log in to access this page."
         in test_client.get("/settings", follow_redirects=True).data

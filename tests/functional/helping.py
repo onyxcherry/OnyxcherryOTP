@@ -46,6 +46,15 @@ def sign_in_remember(test_client, username, password):
     return sign_in_with_remember_response
 
 
+def sign_in_no_fr(test_client, username, password):
+    sign_in_response = test_client.post(
+        "/auth/login",
+        data=dict(username=username, password=password),
+        follow_redirects=False,
+    )
+    return sign_in_response
+
+
 def refresh_session(test_client, password):
     refresh_password_response = test_client.post(
         "/auth/refresh", data=dict(password=password),
@@ -58,3 +67,50 @@ def refresh_session_fr(test_client, password):
         "/auth/refresh", data=dict(password=password), follow_redirects=True,
     )
     return refresh_session_response
+
+
+def reset_password(test_client, token, new_password):
+    response = test_client.post(
+        f"/auth/reset_password/{token}",
+        data=dict(password=new_password, password2=new_password),
+        follow_redirects=True,
+    )
+    return response
+
+
+def activate_2fa(test_client):
+    response = test_client.get("twofa/activate", follow_redirects=True)
+    return response
+
+
+def deactivate_2fa(test_client):
+    response = test_client.get("/twofa/deactivate", follow_redirects=True)
+    return response
+
+
+def generate_token(test_client):
+    response = test_client.get("/twofa/generate_token", follow_redirects=True)
+    return response
+
+
+def reset_password_request(test_client, email):
+    response = test_client.post(
+        "/auth/reset_password_request",
+        data=dict(email=email),
+        follow_redirects=True,
+    )
+    return response
+
+
+def register(test_client, username, email, password, password2):
+    response = test_client.post(
+        "/auth/register",
+        data=dict(
+            username=username,
+            email=email,
+            password=password,
+            password2=password2,
+        ),
+        follow_redirects=True,
+    )
+    return response

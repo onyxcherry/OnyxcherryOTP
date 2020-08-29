@@ -1,11 +1,9 @@
+from helping import sign_in_no_fr
+
+
 def test_cookie_security_flags(test_client, init_database):
-    response = test_client.post(
-        "/auth/login",
-        data=dict(
-            username="josh_9",
-            password="m7ZTbjQdwuUFU/Zy6la+k6uUtniBExIgEhmBPduKexM=",
-        ),
-        follow_redirects=False,
+    response = sign_in_no_fr(
+        test_client, "josh_9", "m7ZTbjQdwuUFU/Zy6la+k6uUtniBExIgEhmBPduKexM="
     )
     cookie_header = response.headers.get("Set-Cookie")
     assert "Path=/" in cookie_header
