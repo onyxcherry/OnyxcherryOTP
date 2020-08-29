@@ -10,7 +10,7 @@ def test_activating_2fa_non_fresh_session_invalid_password(
     test_client.delete_cookie(server_name="localhost", key="session")
     temporary_request = test_client.get("/settings", follow_redirects=True)
     refresh_response = test_client.get(
-        "/auth/activate_2fa", follow_redirects=True
+        "/twofa/activate", follow_redirects=True
     )
     assert (
         b"To protect your account, please reauthenticate to access this page."
@@ -22,7 +22,7 @@ def test_activating_2fa_non_fresh_session_invalid_password(
     assert b"Invalid password" in refreshing_password_response.data
 
     generate_token_response = test_client.get(
-        "/auth/generate_token", follow_redirects=True
+        "/twofa/generate_token", follow_redirects=True
     )
     assert (
         b"To protect your account, please reauthenticate to access this page."

@@ -1,5 +1,3 @@
-import json
-
 import pyotp
 from helping import (
     delete_session_cookie,
@@ -16,7 +14,7 @@ def test_remember_me_with_2fa_enabled(test_client, init_database):
     _ = sign_in_remember(test_client, "dave", "wselfknskjdksdaiujlj")
     otp_code = pyotp.TOTP(otp_token).now()
     send_otp_code_response = test_client.post(
-        "/auth/check_2fa_login",
+        "/twofa/check_login",
         data=dict(otp_code=otp_code),
         follow_redirects=True,
     )

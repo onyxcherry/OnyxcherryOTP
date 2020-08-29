@@ -19,6 +19,6 @@ def test_disable_2fa_fresh_session(test_client, init_database):
     assert b"Hello, dave" in index_response.data
 
     deactivate_2fa_response = test_client.get(
-        "/auth/2fa_deactivate", follow_redirects=True
+        "/twofa/deactivate", follow_redirects=True
     )
     assert b"Deactivated 2FA" in deactivate_2fa_response.data

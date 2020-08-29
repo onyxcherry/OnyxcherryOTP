@@ -62,13 +62,3 @@ class ResetPasswordForm(FlaskForm):
 class RefreshLogin(FlaskForm):
     password = PasswordField(_l("Password"), validators=[DataRequired()])
     submit = SubmitField(_l("Submit"))
-
-
-class CheckOTPCode(FlaskForm):
-    password = StringField(_l("Code: "), validators=[DataRequired()])
-    submit = SubmitField(_l("Submit"))
-
-
-class TwoFALogin(FlaskForm):
-    otp_code = StringField(_l("Code: "), validators=[DataRequired()])
-    submit = SubmitField(_l("Submit"))

@@ -11,8 +11,8 @@
     <p><img id="2fa-image" src="{{ url_for('static', filename='2fa.png') }}"></p>
     <!-- <button type="button" class="btn btn-primary">Primary</button> -->
     {% if twofa_enabled %}
-    <a href="{{ url_for('auth.deactivate_2fa') }}" class="btn btn-warning">{{ _('Turn off 2FA') }}</a>
+    <a href="{{ url_for('twofa.deactivate') }}" class="btn btn-warning">{{ _('Turn off 2FA') }}</a>
     {% else %}
-    <a href="{{ url_for('auth.twofa') }}" class="btn btn-primary">{{ _('Turn on 2FA') }}</a>
+    <a href="{{ url_for('twofa.activate') }}" class="btn btn-primary">{{ _('Turn on 2FA') }}</a>
     {% endif %}
 {% endblock %}

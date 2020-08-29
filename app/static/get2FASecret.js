@@ -64,7 +64,7 @@ function showAsQR() {
 
 function submitForm(e, form) {
     e.preventDefault();
-    fetch(base_url + '/auth/checkcode', {
+    fetch(base_url + '/twofa/checkcode', {
         method: 'post',
         headers: {
             'Content-Type': 'text/plain'
@@ -98,7 +98,7 @@ function errorDiv(m) {
 }
 
 function getToken() {
-    fetch(base_url + '/auth/generate_token')
+    fetch(base_url + '/twofa/generate_token')
         .then(response => {
             if (response.ok) {
                 return response.json()

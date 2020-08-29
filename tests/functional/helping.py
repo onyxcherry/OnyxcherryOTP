@@ -4,12 +4,12 @@ import pyotp
 
 
 def enable_user_2fa(test_client):
-    generate_token_response = test_client.get("/auth/generate_token")
+    generate_token_response = test_client.get("/twofa/generate_token")
     token_data = generate_token_response.get_data()
     jsoned_data = json.loads(token_data)
     otp_token = jsoned_data["secret"]
     otp_code = pyotp.TOTP(otp_token).now()
-    check_code_response = test_client.post("/auth/checkcode", data=otp_code)
+    check_code_response = test_client.post("/twofa/checkcode", data=otp_code)
     assert b"OK" in check_code_response.data
     assert check_code_response.status_code == 200
     return otp_token
@@ -21,7 +21,7 @@ def delete_session_cookie(test_client):
 
 def send_otp_code(test_client, otp_code):
     send_otp_code_response = test_client.post(
-        "/auth/check_2fa_login",
+        "/twofa/check_login",
         data=dict(otp_code=otp_code),
         follow_redirects=True,
     )

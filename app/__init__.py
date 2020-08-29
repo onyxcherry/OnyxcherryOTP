@@ -52,6 +52,10 @@ def create_app(config_class=Config):
 
     app.register_blueprint(auth_bp, url_prefix="/auth")
 
+    from app.twofa import bp as twofa_bp
+
+    app.register_blueprint(twofa_bp, url_prefix="/twofa")
+
     from app.main import bp as main_bp
 
     app.register_blueprint(main_bp)

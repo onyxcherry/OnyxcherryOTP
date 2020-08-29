@@ -1,7 +1,3 @@
-import datetime
-import json
-import os
-
 import pyotp
 import pytest
 from app import Config, create_app, db

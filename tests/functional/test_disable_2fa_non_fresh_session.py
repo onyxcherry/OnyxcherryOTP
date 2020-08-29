@@ -20,7 +20,7 @@ def test_disable_2fa_non_fresh_session(test_client, init_database):
     index_response = test_client.get("/")
     assert b"Hello, dave" in index_response.data
     deactivate_2fa_first_response = test_client.get(
-        "/auth/2fa_deactivate", follow_redirects=True
+        "/twofa/deactivate", follow_redirects=True
     )
     assert (
         b"To protect your account, please reauthenticate to access this page."
@@ -28,6 +28,6 @@ def test_disable_2fa_non_fresh_session(test_client, init_database):
     )
     refresh_session(test_client, "wselfknskjdksdaiujlj")
     deactivate_2fa_second_response = test_client.get(
-        "/auth/2fa_deactivate", follow_redirects=True
+        "/twofa/deactivate", follow_redirects=True
     )
     assert b"Deactivated 2FA" in deactivate_2fa_second_response.data

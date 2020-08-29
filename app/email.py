@@ -1,5 +1,4 @@
 import asyncio
-import logging
 import os
 from threading import Thread
 
@@ -37,7 +36,7 @@ def send_real_email(
     )
     from_email = From(sender, sender_name)
     to_email = To(recipients)
-    plain_text_content = Content("text/plain", text_body)
+    Content("text/plain", text_body)
     html_content = Content("text/html", html_body)
     em = Mail(from_email, to_email, subject, html_content)
     asyncio.run(send_email_sendgrid(em, sendgrid_client))
