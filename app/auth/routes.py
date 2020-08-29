@@ -1,6 +1,5 @@
 from datetime import datetime
 
-import jwt
 import pyotp
 from app import db
 from app.auth import bp
@@ -13,12 +12,9 @@ from app.auth.forms import (
     ResetPasswordRequestForm,
 )
 from app.models import OTP, ResetPassword, User
-from app.twofa.forms import CheckOTPCode, TwoFALogin
+from app.twofa.forms import TwoFALogin
 from flask import (
-    abort,
-    current_app,
     flash,
-    jsonify,
     make_response,
     redirect,
     render_template,
@@ -29,7 +25,6 @@ from flask_babel import _
 from flask_login import (
     confirm_login,
     current_user,
-    fresh_login_required,
     login_fresh,
     login_required,
     login_user,

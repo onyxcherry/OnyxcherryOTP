@@ -5,7 +5,6 @@ from time import time
 from typing import Tuple
 
 import jwt
-import pyotp
 from app import bcrypt, db, login
 from flask import current_app
 from flask_login import UserMixin
