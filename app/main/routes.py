@@ -1,5 +1,5 @@
 from app.main import bp
-from app.models import OTP
+from app.models import OTP, User
 from flask import render_template
 from flask_babel import _
 from flask_login import current_user, login_required
@@ -15,7 +15,9 @@ def index():
 @bp.route("/settings")
 @login_required
 def settings():
-    user_twofa = OTP.query.filter_by(user_id=current_user.get_id()).first()
+    user_id = current_user.get_id()
+    database_id = User.get_database_id(user_id)
+    user_twofa = OTP.query.filter_by(user_id=database_id).first()
     if user_twofa and user_twofa.is_valid is True:
         return render_template(
             "settings/settings.html", title=_("Settings"), twofa_enabled=True

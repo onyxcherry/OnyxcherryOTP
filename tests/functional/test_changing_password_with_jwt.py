@@ -12,7 +12,7 @@ def test_changing_password_with_jwt(test_client, init_database):
     token = user.get_reset_password_token(value)
     db_date = datetime.utcnow()
     reset_password_new = ResetPassword(
-        first_value=value, first_date=db_date, user_id=user.id
+        first_value=value, first_date=db_date, user_id=user.did
     )
     init_database.session.add(reset_password_new)
     init_database.session.commit()

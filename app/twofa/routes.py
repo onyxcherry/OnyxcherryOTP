@@ -51,12 +51,14 @@ def activate():
 def generate_token():
     if current_user.is_anonymous:
         abort(401)
-    otp = OTP.query.filter_by(user_id=current_user.get_id()).first()
+    user_id = current_user.get_id()
+    database_id = User.get_database_id(user_id)
+    otp = OTP.query.filter_by(user_id=database_id).first()
     if not otp:
         new_otp = OTP(
             secret=generate_base32_secret(),
             is_valid=False,
-            user_id=current_user.get_id(),
+            user_id=database_id,
         )
         db.session.add(new_otp)
         db.session.commit()
@@ -65,15 +67,15 @@ def generate_token():
         db.session.add(otp)
         db.session.commit()
     current_otp_secret = (
-        OTP.query.filter_by(user_id=current_user.get_id()).first().secret
+        OTP.query.filter_by(user_id=database_id).first().secret
     )
-    user = User.query.filter_by(id=current_user.get_id()).first()
+    user = User.query.filter_by(did=database_id).first()
     app_qrcode_source = pyotp.totp.TOTP(current_otp_secret).provisioning_uri(
         name=user.email, issuer_name="Onyxcherry OTP"
     )
 
     status = "OK"
-    # Verify the reason of returnning status
+    # TO-DO: verify the reason of returnning status
     response = {
         "status": status,
         "secret": current_otp_secret,
@@ -87,7 +89,9 @@ def generate_token():
 def checkcode():
     if current_user.is_anonymous:
         abort(401)
-    user_otp = OTP.query.filter_by(user_id=current_user.get_id()).first()
+    user_id = current_user.get_id()
+    database_id = User.get_database_id(user_id)
+    user_otp = OTP.query.filter_by(user_id=database_id).first()
     if user_otp.is_valid == 1:
         return "2FA is enabled."
     latest = pyotp.TOTP(user_otp.secret).verify(request.data.decode())
@@ -124,7 +128,7 @@ def check_login():
         flash(_("Invalid token!"))
         return redirect(url_for("auth.login"))
     user = User.query.filter_by(username=username).first()
-    otp = OTP.query.filter_by(user_id=user.id).first()
+    otp = OTP.query.filter_by(user_id=user.did).first()
     if otp.remaining_attempts < 1:
         abort(401)
     latest = check_last_otp_code(otp.secret, otp_code)
@@ -146,7 +150,9 @@ def check_login():
 @login_required
 @fresh_login_required
 def deactivate():
-    otp_data = OTP.query.filter_by(user_id=current_user.get_id()).first()
+    user_id = current_user.get_id()
+    database_id = User.get_database_id(user_id)
+    otp_data = OTP.query.filter_by(user_id=database_id).first()
     if otp_data.is_valid == 1:
         otp_data.is_valid = 0
         db.session.add(otp_data)

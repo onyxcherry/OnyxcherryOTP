@@ -1,6 +1,7 @@
 import os
 from base64 import b64encode
 from datetime import datetime, timedelta
+from random import SystemRandom
 from time import time
 from typing import Tuple
 
@@ -10,8 +11,21 @@ from flask import current_app
 from flask_login import UserMixin
 
 
+def generate_sid() -> int:
+    cryptogen = SystemRandom()
+    return cryptogen.randrange(9999)
+
+
+def change_session_id(user: object) -> None:
+    new_session_id = generate_sid()
+    user.sid = new_session_id
+    db.session.add(user)
+    db.session.commit()
+
+
 class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    did = db.Column(db.Integer, primary_key=True)
+    sid = db.Column(db.Integer)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
@@ -22,6 +36,38 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return f"<User {self.username}>"
+
+    @staticmethod
+    def get_database_id(user_id: str) -> int:
+        assert isinstance(user_id, str)
+        database_id_str = user_id[:-4]
+        database_id = int(database_id_str)
+        assert isinstance(database_id, int)
+        return database_id
+
+    @staticmethod
+    def get_session_id(user_id: str) -> int:
+        assert isinstance(user_id, str)
+        session_id_str = user_id[-4:]
+        assert len(session_id_str) == 4
+        session_id = int(session_id_str)
+        assert isinstance(session_id, int)
+        return session_id
+
+    @staticmethod
+    def get_padded_session_id_str(session_id: int) -> str:
+        assert isinstance(session_id, int)
+        padded_session_id_str = str(session_id).zfill(4)
+        assert len(padded_session_id_str) == 4
+        return padded_session_id_str
+
+    def get_id(self) -> str:
+        assert isinstance(self.did, int)
+        assert isinstance(self.sid, int)
+        padded_sid = self.get_padded_session_id_str(self.sid)
+        assert len(padded_sid) == 4
+        return_value = f"{self.did}{padded_sid}"
+        return return_value
 
     def set_password(self, password):
         self.password_hash = bcrypt.generate_password_hash(
@@ -118,7 +164,7 @@ class OTP(db.Model):
     is_valid = db.Column(
         db.Boolean, default=False
     )  # change to db.Boolean if database supports booleans
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("user.did"))
     remaining_attempts = db.Column(db.Integer)
 
     def __repr__(self):
@@ -132,12 +178,20 @@ class ResetPassword(db.Model):
     first_date = db.Column(db.DateTime)
     second_value = db.Column(db.String(32))
     second_date = db.Column(db.DateTime)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("user.did"))
 
     def __repr__(self):
         return f"<ResetPasswordValue for user {self.user_id}>"
 
 
 @login.user_loader
-def load_user(id):
-    return User.query.get(int(id))
+def load_user(user_id):
+    # return User.query.get(int(id))
+    assert isinstance(user_id, str)
+    did = User.get_database_id(user_id)
+    sid = User.get_session_id(user_id)
+    user = User.query.filter_by(did=did).first()
+    # Very important check
+    if user.sid == sid:
+        return user
+    return None

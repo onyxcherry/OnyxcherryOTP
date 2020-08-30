@@ -114,3 +114,8 @@ def register(test_client, username, email, password, password2):
         follow_redirects=True,
     )
     return response
+
+
+def get_index(test_client):
+    response = test_client.get("/index", follow_redirects=True)
+    return response

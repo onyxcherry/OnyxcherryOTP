@@ -1,7 +1,9 @@
+from random import SystemRandom
+
 import pyotp
 import pytest
 from app import Config, create_app, db
-from app.models import User
+from app.models import User, generate_sid
 
 
 class TestConfig(Config):
@@ -15,7 +17,7 @@ class TestConfig(Config):
 
 @pytest.fixture(scope="session")
 def user():
-    user = User(username="paul", email="paul@example.com")
+    user = User(username="paul", sid=generate_sid(), email="paul@example.com",)
     return user
 
 
@@ -38,11 +40,19 @@ def init_database():
 
     db.create_all()
 
-    user1 = User(username="straw_berry", email="strawberry8@example.com")
+    user1 = User(
+        username="straw_berry",
+        sid=generate_sid(),
+        email="strawberry8@example.com",
+    )
     user1.set_password("EJew@MHHQ7x-g.4<")
-    user2 = User(username="josh_9", email="josh+otpapp@gmail.com")
+    user2 = User(
+        username="josh_9", sid=generate_sid(), email="josh+otpapp@gmail.com",
+    )
     user2.set_password("m7ZTbjQdwuUFU/Zy6la+k6uUtniBExIgEhmBPduKexM=")
-    user3 = User(username="dave", email="dave16@outlook.com")
+    user3 = User(
+        username="dave", sid=generate_sid(), email="dave16@outlook.com",
+    )
     user3.set_password("wselfknskjdksdaiujlj")
     db.session.add(user1)
     db.session.add(user2)
