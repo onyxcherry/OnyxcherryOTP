@@ -11,3 +11,4 @@ virtualenv
 *.egg-info
 .coverage
 htmlcov
+*.mo

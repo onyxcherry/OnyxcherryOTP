@@ -30,7 +30,11 @@ class RegistrationForm(FlaskForm):
         _l("Password"), validators=[DataRequired(), Length(min=8, max=128)]
     )
     password2 = PasswordField(
-        _l("Repeat Password"), validators=[DataRequired(), EqualTo("password")]
+        _l("Repeat Password"),
+        validators=[
+            DataRequired(),
+            EqualTo("password", message="Passwords must match"),
+        ],
     )
     recaptcha = RecaptchaField()
     submit = SubmitField(_l("Register"))
@@ -52,11 +56,17 @@ class ResetPasswordRequestForm(FlaskForm):
 
 
 class ResetPasswordForm(FlaskForm):
-    password = PasswordField(_l("Password"), validators=[DataRequired()])
-    password2 = PasswordField(
-        _l("Repeat password"), validators=[DataRequired(), EqualTo("password")]
+    password = PasswordField(
+        _l("Password"), validators=[DataRequired(), Length(min=8, max=128)]
     )
-    submit = SubmitField(_l("Request password reset"))
+    password2 = PasswordField(
+        _l("Repeat password"),
+        validators=[
+            DataRequired(),
+            EqualTo("password", message="Passwords must match"),
+        ],
+    )
+    submit = SubmitField(_l("Reset my password"))
 
 
 class RefreshLogin(FlaskForm):
