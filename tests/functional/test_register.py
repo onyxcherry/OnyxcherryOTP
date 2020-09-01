@@ -36,4 +36,4 @@ def test_not_equal_passwords(test_client, init_database):
     response = register(
         test_client, "anything", "josh@example.com", "jjjjjjjj", "kkkkkkkk",
     )
-    assert b"Field must be equal" in response.data
+    assert b"Passwords must match" in response.data
