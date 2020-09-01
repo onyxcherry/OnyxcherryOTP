@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.4\n"
 "Report-Msgid-Bugs-To: tomek@onyxcherry.pl\n"
-"POT-Creation-Date: 2020-09-01 16:55+0200\n"
+"POT-Creation-Date: 2020-09-01 21:21+0200\n"
 "PO-Revision-Date: 2020-06-21 10:53+0200\n"
 "Last-Translator: Tomasz Wiśniewski tomek@onyxcherry.pl\n"
 "Language: pl\n"
@@ -45,7 +45,7 @@ msgstr "Hasło"
 msgid "Remember me"
 msgstr "Zapamiętaj mnie"
 
-#: app/auth/forms.py:19
+#: app/auth/forms.py:19 app/templates/index2.html:29
 msgid "Sign in"
 msgstr "Zaloguj się"
 
@@ -121,16 +121,18 @@ msgstr "Niepoprawne hasło"
 msgid "Refresh your session"
 msgstr "Odnów swoją sesję"
 
-#: app/main/routes.py:12 app/templates/base.html:20
+#: app/main/routes.py:13 app/templates/base.html:20
+#: app/templates/index2.html:26
 msgid "Home"
 msgstr "Strona główna"
 
-#: app/main/routes.py:23 app/main/routes.py:25 app/templates/base.html:23
-#: app/templates/settings/settings.html:5
+#: app/main/routes.py:25 app/main/routes.py:28 app/templates/base.html:23
+#: app/templates/index2.html:27 app/templates/settings/settings.html:4
 msgid "Settings"
 msgstr "Ustawienia"
 
 #: app/templates/base.html:4 app/templates/base_better.html:10
+#: app/templates/index2.html:9
 msgid "Welcome to Onyxcherry OTP"
 msgstr "Witaj w serwisie Onyxcherry OTP"
 
@@ -138,7 +140,7 @@ msgstr "Witaj w serwisie Onyxcherry OTP"
 msgid "Login"
 msgstr "Zaloguj się"
 
-#: app/templates/base.html:27
+#: app/templates/base.html:27 app/templates/index2.html:31
 msgid "Logout"
 msgstr "Wyloguj się"
 
@@ -170,12 +172,12 @@ msgstr "Wróć"
 msgid "The administrator has been notified. Sorry for the inconvenience!"
 msgstr "Administrator serwisu został powiadomiony. Przepraszamy za niedogodności."
 
-#: app/templates/settings/settings.html:9
-#: app/templates/settings/settings.html:16 app/templates/twofa/turn_on.html:21
+#: app/templates/settings/settings.html:8
+#: app/templates/settings/settings.html:15 app/templates/twofa/turn_on.html:21
 msgid "Turn on 2FA"
 msgstr "Włącz 2FA"
 
-#: app/templates/settings/settings.html:14
+#: app/templates/settings/settings.html:13
 msgid "Turn off 2FA"
 msgstr "Wyłącz 2FA"
 
@@ -191,10 +193,6 @@ msgid ""
 msgstr ""
 "Logowanie nie wymaga już podawanie kodu 2FA. Rozważ włączenie tej opcji "
 "ponownie z uwagi na bezpieczeństwo."
-
-#: app/templates/twofa/login_with_twofa.html:5
-msgid "2FA Sign in"
-msgstr "Logowanie 2FA"
 
 #: app/templates/twofa/turn_on.html:24
 msgid "You are activating two factor authentication."

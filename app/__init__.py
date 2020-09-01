@@ -1,5 +1,5 @@
 from config import Config
-from flask import Flask, current_app, request
+from flask import Flask, current_app, render_template, request
 from flask_babel import Babel
 from flask_babel import lazy_gettext as _l
 from flask_bcrypt import Bcrypt
@@ -31,6 +31,15 @@ babel = Babel()
 csrf = CSRFProtect()
 
 
+def page_not_found(e):
+    return render_template("errors/404.html"), 404
+
+
+def internal_error(e):
+    db.session.rollback()
+    return render_template("errors/500.html"), 500
+
+
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
@@ -50,6 +59,9 @@ def create_app(config_class=Config):
     from app.errors import bp as errors_bp
 
     app.register_blueprint(errors_bp)
+
+    app.register_error_handler(404, page_not_found)
+    app.register_error_handler(500, internal_error)
 
     from app.auth import bp as auth_bp
 
