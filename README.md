@@ -49,7 +49,7 @@ flask translate compile
 
 5. Create database
 
-> This project uses sqlite3. You could use anything else.
+> This project uses sqlite3 by default for the convenience. You could use anything else.
 
 ``` bash
 flask shell
@@ -83,3 +83,4 @@ OnyxcherryOTP uses SendGrid to sending emails. Set `MAIL_LOCALHOST=True` in the 
 * [Miguel's incredible Flask tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world)
 * [QR Code svg generator](https://github.com/datalog/qrcode-svg) – client-side, pure Javascript
 * [Bootstrap pretty forms](https://www.bootstrapdash.com/product/free-bootstrap-login/)
+* [Bootstrap Cover theme](https://getbootstrap.com/docs/4.5/examples/cover/)

@@ -1,7 +1,6 @@
-{% extends "base.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
+{% extends "index2.html" %}
 
-{% block app_content %}
+{% block content %}
     <h1>{{ _('Settings') }}</h1>
     {% if twofa_enabled %}
     <h2>{{ ('Turn off 2FA') }}:</h2>

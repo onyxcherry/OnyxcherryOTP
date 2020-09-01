@@ -15,4 +15,3 @@ def test_change_session_id(test_client, init_database):
     )
     old_session_response = get_index(test_client)
     assert b"Hello, dave" not in old_session_response.data
-    assert b"Please log in to access this page." in old_session_response.data
