@@ -1,12 +1,10 @@
-{% extends "base.html" %}
-{% import 'bootstrap/wtf.html' as wtf %}
+{% extends "index2.html" %}
 
-{% block app_content %}
+{% block content %}
 <h1>{{ _('Deactivated 2FA') }}</h1>
 
-<div class="panel panel-success">
-    <div class="panel-heading">{{ _('Deactivated 2FA') }}</div>
-    <div class="panel-body">{{ _("Signing in doesn't require providing 2FA code. Consider turning it on again due to security.") }}</div>
-</div>
+<p class="lead">
+    {{ _("Signing in doesn't require providing 2FA code. Consider turning it on again due to security.") }}
+</p>
 
 {% endblock %}

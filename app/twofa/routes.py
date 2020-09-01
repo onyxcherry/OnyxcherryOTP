@@ -157,5 +157,5 @@ def deactivate():
         otp_data.is_valid = 0
         db.session.add(otp_data)
         db.session.commit()
-        return render_template("twofa/deactivated.html")
+        return render_template("twofa/deactivated.html", settings_active=True)
     return redirect(url_for("main.index"))

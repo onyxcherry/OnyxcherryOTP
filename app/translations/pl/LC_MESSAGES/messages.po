@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.4\n"
 "Report-Msgid-Bugs-To: tomek@onyxcherry.pl\n"
-"POT-Creation-Date: 2020-09-01 21:21+0200\n"
+"POT-Creation-Date: 2020-09-01 21:59+0200\n"
 "PO-Revision-Date: 2020-06-21 10:53+0200\n"
 "Last-Translator: Tomasz Wiśniewski tomek@onyxcherry.pl\n"
 "Language: pl\n"
@@ -45,7 +45,7 @@ msgstr "Hasło"
 msgid "Remember me"
 msgstr "Zapamiętaj mnie"
 
-#: app/auth/forms.py:19 app/templates/index2.html:29
+#: app/auth/forms.py:19 app/templates/index2.html:31
 msgid "Sign in"
 msgstr "Zaloguj się"
 
@@ -122,12 +122,12 @@ msgid "Refresh your session"
 msgstr "Odnów swoją sesję"
 
 #: app/main/routes.py:13 app/templates/base.html:20
-#: app/templates/index2.html:26
+#: app/templates/index2.html:27
 msgid "Home"
 msgstr "Strona główna"
 
-#: app/main/routes.py:25 app/main/routes.py:28 app/templates/base.html:23
-#: app/templates/index2.html:27 app/templates/settings/settings.html:4
+#: app/main/routes.py:26 app/main/routes.py:31 app/templates/base.html:23
+#: app/templates/index2.html:29 app/templates/settings/settings.html:4
 msgid "Settings"
 msgstr "Ustawienia"
 
@@ -140,9 +140,36 @@ msgstr "Witaj w serwisie Onyxcherry OTP"
 msgid "Login"
 msgstr "Zaloguj się"
 
-#: app/templates/base.html:27 app/templates/index2.html:31
+#: app/templates/base.html:27 app/templates/index2.html:33
 msgid "Logout"
 msgstr "Wyloguj się"
+
+#: app/templates/form_page.html:30
+msgid "Terms of use."
+msgstr "Warunki użytkowania."
+
+#: app/templates/form_page.html:31
+msgid "Privacy policy"
+msgstr "Polityka prywatności"
+
+#: app/templates/index2.html:49
+msgid "Hello"
+msgstr "Cześć"
+
+#: app/templates/index2.html:50
+msgid ""
+"This is my implementation of two-factor authentication app in Flask with "
+"required fresh login,\n"
+"        revoking other sessions and translations handled by Flask-Babel."
+msgstr ""
+
+#: app/templates/index2.html:52
+msgid "Get more informations below:"
+msgstr ""
+
+#: app/templates/index2.html:54
+msgid "Check source"
+msgstr ""
 
 #: app/templates/auth/login.html:22
 msgid "Forgot your password?"
@@ -161,7 +188,7 @@ msgid "Click to register!"
 msgstr "Kliknij, by się zarejestrować"
 
 #: app/templates/errors/404.html:4
-msgid "File Not Found"
+msgid "File not found"
 msgstr "Nie znaleziono pliku"
 
 #: app/templates/errors/404.html:5 app/templates/errors/500.html:6
@@ -173,20 +200,18 @@ msgid "The administrator has been notified. Sorry for the inconvenience!"
 msgstr "Administrator serwisu został powiadomiony. Przepraszamy za niedogodności."
 
 #: app/templates/settings/settings.html:8
-#: app/templates/settings/settings.html:15 app/templates/twofa/turn_on.html:21
-msgid "Turn on 2FA"
-msgstr "Włącz 2FA"
-
-#: app/templates/settings/settings.html:13
 msgid "Turn off 2FA"
 msgstr "Wyłącz 2FA"
 
-#: app/templates/twofa/deactivated.html:5
-#: app/templates/twofa/deactivated.html:8
+#: app/templates/settings/settings.html:10 app/templates/twofa/turn_on.html:21
+msgid "Turn on 2FA"
+msgstr "Włącz 2FA"
+
+#: app/templates/twofa/deactivated.html:4
 msgid "Deactivated 2FA"
 msgstr "Wyłączono 2FA"
 
-#: app/templates/twofa/deactivated.html:9
+#: app/templates/twofa/deactivated.html:7
 msgid ""
 "Signing in doesn't require providing 2FA code. Consider turning it on "
 "again due to security."

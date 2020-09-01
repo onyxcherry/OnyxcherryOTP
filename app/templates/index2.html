@@ -23,8 +23,10 @@
       <div class="inner">
         <h3 class="masthead-brand">OnyxcherryOTP</h3>
         <nav class="nav nav-masthead justify-content-center">
-          <a class="nav-link {% if not settings_active %}active{% endif %}" href="{{ url_for('main.index') }}">{{ _('Home') }}</a>
-          <a class="nav-link {% if settings_active %}active{% endif %}" href="{{ url_for('main.settings') }}">{{ _('Settings') }}</a>
+          <a class="nav-link {% if not settings_active %}active{% endif %}"
+            href="{{ url_for('main.index') }}">{{ _('Home') }}</a>
+          <a class="nav-link {% if settings_active %}active{% endif %}"
+            href="{{ url_for('main.settings') }}">{{ _('Settings') }}</a>
           {% if current_user.is_anonymous %}
           <a class="nav-link" href="{{ url_for('auth.login') }}">{{ _('Sign in') }}</a>
           {% else %}
@@ -43,19 +45,19 @@
       {% endif %}
       {% endwith %}
       {% if default_content %}
-      
-      <h1 class="cover-heading">Hello, {{ current_user.username }}</h1>
-      <p class="lead">This is my implementation of two-factor authentication app in Flask with required fresh login
-        panels and translations handled by Flask-Babel. </p>
-        <p class="lead">Get more informations below:</p>
-        <p class="lead">
-          <a href="https://github.com/onyxcherry/OnyxcherryOTP" class="btn btn-lg btn-secondary">Check source</a>
-        </p>
-        {% else %}
-        {% block content %}
-        
-        {% endblock %}
-        {% endif %}
+
+      <h1 class="cover-heading">{{ _('Hello') }}, {{ current_user.username }}</h1>
+      <p class="lead">{{ _('This is my implementation of two-factor authentication app in Flask with required fresh login,
+        revoking other sessions and translations handled by Flask-Babel.') }}</p>
+      <p class="lead">{{ _('Get more informations below:') }}</p>
+      <p class="lead">
+        <a href="https://github.com/onyxcherry/OnyxcherryOTP" class="btn btn-lg btn-secondary">{{ _('Check source') }}</a>
+      </p>
+      {% else %}
+      {% block content %}
+
+      {% endblock %}
+      {% endif %}
     </main>
 
     <footer class="mastfoot mt-auto">

@@ -22,7 +22,10 @@ def settings():
     user_twofa = OTP.query.filter_by(user_id=database_id).first()
     if user_twofa and user_twofa.is_valid is True:
         return render_template(
-            "settings/settings.html", title=_("Settings"), twofa_enabled=True
+            "settings/settings.html",
+            title=_("Settings"),
+            twofa_enabled=True,
+            settings_active=True,
         )
     return render_template(
         "settings/settings.html", title=_("Settings"), settings_active=True
