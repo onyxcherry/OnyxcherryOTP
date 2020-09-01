@@ -82,3 +82,4 @@ OnyxcherryOTP uses SendGrid to sending emails. Set `MAIL_LOCALHOST=True` in the 
 
 * [Miguel's incredible Flask tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world)
 * [QR Code svg generator](https://github.com/datalog/qrcode-svg) – client-side, pure Javascript
+* [Bootstrap pretty forms](https://www.bootstrapdash.com/product/free-bootstrap-login/)

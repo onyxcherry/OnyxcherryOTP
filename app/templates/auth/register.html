@@ -1,11 +1,43 @@
-{% extends "base.html" %}
-{% import 'bootstrap/wtf.html' as wtf %}
-
-{% block app_content %}
-    <h1>{{ _('Register') }}</h1>
-    <div class="row">
-        <div class="col-md-4">
-            {{ wtf.quick_form(form) }}
-        </div>
+{% extends 'form_page.html' %}
+{% block forms %}
+<form action="{{ url_for('auth.register') }}" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div class="form-group">
+        {{ form.username.label }}
+        {{ form.username(class_="form-control", size="64", autofocus='autofocus') }}
+        {% for error in form.username.errors %}
+        <p class="help-block">{{ error }}</p>
+        {% endfor %}
     </div>
+    <div class="form-group mb-4">
+        {{ form.email.label }}
+        {{ form.email(class_="form-control", size="120") }}
+        {% for error in form.email.errors %}
+        <p class="help-block">{{ error }}</p>
+        {% endfor %}
+    </div>
+    <div class="form-group mb-4">
+        {{ form.password.label }}
+        {{ form.password(class_="form-control", size="128") }}
+        {% for error in form.password.errors %}
+        <p class="help-block">{{ error }}</p>
+        {% endfor %}
+    </div>
+    <div class="form-group mb-4">
+        {{ form.password2.label }}
+        {{ form.password2(class_="form-control", size="128") }}
+        {% for error in form.password2.errors %}
+        <p class="help-block">{{ error }}</p>
+        {% endfor %}
+    </div>
+    <div class="form-group mb-4">
+    {{ form.recaptcha.label }}
+    {{ form.recaptcha(class_="form-control") }}
+    {% for error in form.recaptcha.errors %}
+        <p class="help-block">{{ error }}</p>
+        {% endfor %}
+</div>
+<p></p>
+    {{ form.submit(class="btn btn-block login-btn mb-4") }}
+</form>
 {% endblock %}

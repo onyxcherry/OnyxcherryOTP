@@ -8,6 +8,8 @@ from app.models import User, generate_sid
 
 class TestConfig(Config):
     TESTING = True
+    WTF_CSRF_ENABLED = False
+    WTF_CSRF_METHODS = []
     SQLALCHEMY_DATABASE_URI = "sqlite://"
     BCRYPT_LOG_ROUNDS = 4
     WTF_CSRF_ENABLED = False

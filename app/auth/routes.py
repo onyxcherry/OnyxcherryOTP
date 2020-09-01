@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import pyotp
-from app import db
+from app import csrf, db
 from app.auth import bp
 from app.auth.email import send_password_reset_email
 from app.auth.forms import (
@@ -48,6 +48,11 @@ def get_next_page(next_from_request: str) -> str:
 
 def generate_base32_secret():
     return pyotp.random_base32()
+
+
+@bp.before_request
+def check_csrf():
+    csrf.protect()
 
 
 @bp.route("/")

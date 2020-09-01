@@ -8,6 +8,7 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf.csrf import CSRFProtect
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -27,6 +28,7 @@ mail = Mail()
 bootstrap = Bootstrap()
 bcrypt = Bcrypt()
 babel = Babel()
+csrf = CSRFProtect()
 
 
 def create_app(config_class=Config):
@@ -37,6 +39,7 @@ def create_app(config_class=Config):
     login.init_app(app)
     mail.init_app(app)
     bootstrap.init_app(app)
+    csrf.init_app(app)
     babel.init_app(app)
     with app.app_context():
         if db.engine.url.drivername == "sqlite":
