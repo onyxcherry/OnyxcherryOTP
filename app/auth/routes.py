@@ -18,7 +18,7 @@ from app.models import (
     change_session_id,
     generate_sid,
 )
-from app.twofa.forms import TwoFALogin
+from app.twofa.forms import CheckOTPCode
 from flask import (
     flash,
     make_response,
@@ -78,7 +78,7 @@ def login():
             user_otp.remaining_attempts = 3
             db.session.add(user_otp)
 
-            form = TwoFALogin()
+            form = CheckOTPCode()
             token = user.set_valid_credentials(remember_me)
             response = make_response(
                 render_template("twofa/login_with_twofa.html", form=form)

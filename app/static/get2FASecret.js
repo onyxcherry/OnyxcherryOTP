@@ -1,132 +1,110 @@
-const userLang = window.navigator.language.split('-')[0]
-
 const base_url = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`
+var already_showed_qrcode = false;
+const twofa_messages = document.getElementById('twofa-messages')
+const otp_code_form = document.getElementById('otp_code_form')
+const twofa_qrcode = document.getElementById('twofa-qrcodeAAA')
+const twofa_text_code = document.getElementById('twofa-text-code')
+const get_token_button = document.getElementById('get-token-button')
+const change_view_buttonAAA = document.getElementById('change-viewAAA')
 
-const panel_info = document.querySelector('.panel-info')
-const panel_danger = document.querySelector('.panel-danger')
-const panel_success = document.querySelector('.panel-success')
-const panel_primary = document.querySelector('.panel-primary')
-const panel_warning = document.querySelector('.panel-warning')
 
-messages = {
-    "otp_info":{
-       "en":[
-          "Scan the QR and type the code from app below.",
-          "Use an OTP app, e.g. Authy or Google Authenticator."
-       ],
-       "pl":[
-          "Zeskanuj poniższy kod QR.",
-          "Użyj aplikacji - np. Authy lub Google Authenticator."
-       ]
-    }
- }
-
-view_as_text_button = document.getElementById('viewAsText')
-view_as_qr_button = document.getElementById('viewAsQR')
-
-twofa_qrcode = document.getElementById('2fa-qrcode')
-
-view_as_text_button.addEventListener('click', () => {
-    showAsText()
-})
-
-view_as_qr_button.addEventListener('click', () => {
-    showAsQR()
-})
-
-get_token_button = document.getElementById('getTokenButton')
-get_token_button.addEventListener('click', () => {
-    getToken();
-})
-
-check_code_form = document.getElementById('checkCode')
+check_code_form = document.getElementById('otp_code_form')
 check_code_form.addEventListener('submit', e => {
     submitForm(e, check_code_form)
 })
 
-function invalidCode() {
-    panel_warning.style.display = 'block';
-};
 
-function showAsText() {
-    view_as_text_button.style.display = 'none'
-    view_as_qr_button.style.display = 'block'
-    twofa_qrcode.style.display = 'none'
-    panel_primary.style.display = 'block'
-}
-
-function showAsQR() {
-    view_as_text_button.style.display = 'block'
-    view_as_qr_button.style.display = 'none'
-    twofa_qrcode.style.display = 'block'
-    panel_primary.style.display = 'none'
-}
-
-function submitForm(e, form) {
-    e.preventDefault();
-    fetch(base_url + '/twofa/checkcode', {
+async function postFormData(url, value) {
+    const response = await fetch(url, {
         method: 'post',
         headers: {
             'Content-Type': 'text/plain'
         },
-        body: form.user_code.value
-    }).then(response => {
-        if (response.ok) {
-            return response.text()
-        } else {
-            errorDiv();
-            return Promise.reject(response)
-        }
-    }).then(response => {
-        if (response !== 'OK' && response !== '2FA is enabled.') {
-            invalidCode();
-        } else {
-            document.getElementById('2fa-user-code').style.display = 'none';
-            document.getElementById('2fa-qrcode').style.display = 'none';
-            panel_success.style.display = 'block'
-            panel_info.style.display = 'none'
-            panel_danger.style.display = 'none'
-        }
-    }).catch(err => {
-        errorDiv()
+        body: value
     });
+    try {
+        return response.json()
+    }
+    catch (error) { return console.log(error) }
 }
 
-function errorDiv(m) {
-    panel_danger.style.display = 'block';
-    console.log(m)
+async function submitForm(e, form) {
+    e.preventDefault();
+    const data = await postFormData(`${base_url}/twofa/checkcode`, form.otp_code.value);
+    const status = data['status']
+    const message = data['message']
+
+    twofa_messages.innerText = message
+    twofa_messages.style.display = 'block'
+
+    if (status === 'OK') {
+        otp_code_form.style.display = 'none'
+        change_view_buttonAAA.style.display = 'none'
+        get_token_button.style.display = 'none'
+        twofa_qrcode.style.display = 'none'
+        twofa_text_code.style.display = 'none'
+    }
 }
 
-function getToken() {
-    fetch(base_url + '/twofa/generate_token')
-        .then(response => {
-            if (response.ok) {
-                return response.json()
-            } else {
-                errorDiv();
-                return Promise.reject(response)
-            }
-        })
-        .then(response => {
-            panel_info.firstElementChild.innerText = messages['otp_info'][userLang][0]
-            panel_info.children[1].innerText = messages['otp_info'][userLang][1]
-            if (response['app_qrcode']) {
-                var svgNode = QRCode(response['app_qrcode'])
-            } else {
-                errorDiv()
-            }
-            if (response['secret']) {
-                panel_primary.innerText = response['secret']
-            }
-            const twofa_qrcode = document.getElementById('2fa-qrcode')
-            if (!twofa_qrcode.firstChild) {
-                twofa_qrcode.appendChild(svgNode);
-            }
-            document.getElementById('getTokenButton').style.display = 'none';
-            document.getElementById('2fa-user-code').style.display = 'block';
 
-        })
-        .catch(error => {
-            errorDiv();
-        });
+async function getJsonData(url) {
+    const response = await fetch(url)
+    try {
+        return response.json()
+    }
+    catch (error) { return console.log(error) }
+}
+
+function change_viewAAAAAAA() {
+    if (already_showed_qrcode) {
+        showTextCodeAAA();
+        already_showed_qrcode = false;
+    }
+    else {
+        showQRCodeAAA();
+        already_showed_qrcode = true;
+    }
+}
+
+change_view_buttonAAA.addEventListener('click', () => {
+    change_viewAAAAAAA()
+})
+
+get_token_button.addEventListener('click', () => {
+    createQRCode()
+    change_viewAAAAAAA()
+    otp_code_form.style.display = 'block'
+    change_view_buttonAAA.style.display = 'block'
+    get_token_button.style.display = 'none'
+    twofa_messages.style.display = 'none'
+})
+
+async function createQRCode() {
+    const url = `${base_url}/twofa/generate_token`;
+    const data = await getJsonData(url);
+    if (data['status'] === 'OK') {
+        const secret = data['secret']
+        const app_qrcode = data['app_qrcode']
+        const svgNode = QRCode({ msg: app_qrcode, pad: 1, pal: ['#000000', '#ffffff'] })
+        if (!twofa_qrcode.firstChild) {
+            twofa_qrcode.appendChild(svgNode);
+        }
+        twofa_text_code.innerText = secret
+    }
+    else { console.log('An error occurred') }
+
+
+}
+
+function showQRCodeAAA() {
+    twofa_qrcode.style.display = 'block'
+    twofa_text_code.style.display = 'none'
+    change_view_buttonAAA.innerText = 'Show secret as text'
+}
+
+function showTextCodeAAA() {
+    twofa_qrcode.style.display = 'none'
+    twofa_text_code.style.display = 'block'
+    change_view_buttonAAA.innerText = 'Show QR Code'
+
 }

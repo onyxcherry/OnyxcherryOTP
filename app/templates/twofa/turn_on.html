@@ -1,57 +1,46 @@
-{% extends "base.html" %}
-{% import 'bootstrap/wtf.html' as wtf %}
+{% extends "index2.html" %}
 
-
-{% block app_content %}
+{% block content %}
 <style>
-.panel-heading {
-    font-size: 2.5rem;
-}
-.panel-body, .btn-info {
-    font-size: 2rem;
-}
-.control-label {
-    font-size: 2rem;
-}
-.form-control {
-    font-size: 3rem;
-}
+    #twofa-text-code,
+    #twofa-qrcodeAAA,
+    #change-viewAAA,
+    #otp_code_form {
+        display: none;
+    }
+
+    #change-viewAAA {
+        max-width: 20em;
+        left: 50%;
+        margin: 0 auto;
+        font-size: 1.2em;
+    }
 </style>
-
 <h1>{{ _('Turn on 2FA') }}</h1>
-<div id="2fa-messages"></div>
-<div class="panel panel-info">
-    <div class="panel-heading">{{ _('You are activating two factor authentication.') }}</div>
-    <div class="panel-body">{{ _('Please keep the secret private.') }}</div>
-</div>
-<div class="panel panel-success" style="display: none;">
-    <div class="panel-heading">{{ _('Turned on 2FA.') }}</div>
-    <div class="panel-body">{{ _('You could go to the main page.') }}</div>
-</div>
-<div class="panel panel-warning" style="display: none;">
-    <div class="panel-heading">{{ _('Invalid OTP code!') }}</div>
-    <div class="panel-body">{{ _('Try again.') }}</div>
-  </div>
-<div class="panel panel-danger" style="display: none;">
-    <div class="panel-heading">{{ _('An error occured.') }}</div>
-    <div class="panel-body">{{ _('Please contact the administrator.') }}</div>
-</div>
 
-<div id="2fa-qrcode" style="display: block;"></div>
-<div id="2fa-user-code" style="display: none;" class="col-md-3">
-    <div class="panel panel-primary panel-body" style="display: none;"></div>
-    <form action="/twofa/checkcode" method="POST" class="form" id="checkCode" role="form">
-        <div id="viewAsText" class="btn btn-info">{{ _('Show secret as text') }}</div>
-        <div id="viewAsQR" class="btn btn-info" style="display: none;">{{ _('Show QR Code') }}</div>
-        <div class="form-group required" style="padding-top: 0.5em;">
-            <label class="control-label" for="user_code">{{ _('OTP code: ') }}</label>
-            <input class="form-control" id="user_code" name="user_code" required type="text">
-        </div>
-        <input class="btn btn-default btn-lg" id="submit" name="submit" type="submit" value="Submit">
-    </form>
-</div>
+<p id="head-message" class="lead">{{ _('You are activating two factor authentication.') }}</p>
 
-<div id="getTokenButton" class="btn btn-primary btn-lg" style="margin-top: 20px;">{{ _('I understand') }}</div>
+<p id="twofa-messages" class="alert alert-dark">{{ _('Please keep the secret private.') }}</p>
+<p id="twofa-helper" class="alert alert-dark">{{ _('Scan the QR and type the code from app below.') }}
+    {{ _('Use an OTP app, e.g. Authy or Google Authenticator.') }}</p>
+
+<div id="twofa-qrcodeAAA"></div>
+<div id="twofa-text-code" class="lead"></div>
+
+<p class="lead">
+<div id="change-viewAAA" class="btn btn-sm btn-secondary"><b>{{ _('Show secret as text') }}</div>
+</p>
+
+<p></p>
+<form action="/twofa/checkcode" method="POST" id="otp_code_form" class="lead">
+    {{ form.otp_code.label }}
+
+    {{ form.otp_code(autofocus='autofocus', maxlength="6", size=6) }}
+    <p></p>
+    <input class="btn btn-info btn-lg" id="submit" name="submit" type="submit" value="Submit">
+</form>
+
+<div id="get-token-button" class="btn btn-primary btn-lg" style="margin-top: 20px;">{{ _('I understand') }}</div>
 
 <script src="/static/qrcode.min.js" async defer></script>
 <script src="/static/get2FASecret.js" async defer></script>

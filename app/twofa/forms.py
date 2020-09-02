@@ -5,10 +5,5 @@ from wtforms.validators import DataRequired
 
 
 class CheckOTPCode(FlaskForm):
-    password = StringField(_l("Code: "), validators=[DataRequired()])
-    submit = SubmitField(_l("Submit"))
-
-
-class TwoFALogin(FlaskForm):
     otp_code = StringField(_l("Code: "), validators=[DataRequired()])
     submit = SubmitField(_l("Submit"))

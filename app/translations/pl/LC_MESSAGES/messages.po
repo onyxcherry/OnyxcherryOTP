@@ -6,9 +6,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version:  1.4\n"
+"Project-Id-Version:  1.4.2\n"
 "Report-Msgid-Bugs-To: tomek@onyxcherry.pl\n"
-"POT-Creation-Date: 2020-09-01 21:59+0200\n"
+"POT-Creation-Date: 2020-09-02 20:26+0200\n"
 "PO-Revision-Date: 2020-06-21 10:53+0200\n"
 "Last-Translator: Tomasz Wiśniewski tomek@onyxcherry.pl\n"
 "Language: pl\n"
@@ -81,7 +81,7 @@ msgstr "Powtórz hasło"
 msgid "Reset my password"
 msgstr "Zresetuj moje hasło"
 
-#: app/auth/forms.py:74 app/twofa/forms.py:9 app/twofa/forms.py:14
+#: app/auth/forms.py:74 app/twofa/forms.py:9
 msgid "Submit"
 msgstr "Zatwierdź"
 
@@ -121,28 +121,18 @@ msgstr "Niepoprawne hasło"
 msgid "Refresh your session"
 msgstr "Odnów swoją sesję"
 
-#: app/main/routes.py:13 app/templates/base.html:20
-#: app/templates/index2.html:27
+#: app/main/routes.py:13 app/templates/index2.html:27
 msgid "Home"
 msgstr "Strona główna"
 
-#: app/main/routes.py:26 app/main/routes.py:31 app/templates/base.html:23
-#: app/templates/index2.html:29 app/templates/settings/settings.html:4
+#: app/main/routes.py:26 app/main/routes.py:31 app/templates/index2.html:29
+#: app/templates/settings/settings.html:4
 msgid "Settings"
 msgstr "Ustawienia"
 
-#: app/templates/base.html:4 app/templates/base_better.html:10
-#: app/templates/index2.html:9
+#: app/templates/base_better.html:10 app/templates/index2.html:9
 msgid "Welcome to Onyxcherry OTP"
 msgstr "Witaj w serwisie Onyxcherry OTP"
-
-#: app/templates/base.html:25
-msgid "Login"
-msgstr "Zaloguj się"
-
-#: app/templates/base.html:27 app/templates/index2.html:33
-msgid "Logout"
-msgstr "Wyloguj się"
 
 #: app/templates/form_page.html:30
 msgid "Terms of use."
@@ -151,6 +141,10 @@ msgstr "Warunki użytkowania."
 #: app/templates/form_page.html:31
 msgid "Privacy policy"
 msgstr "Polityka prywatności"
+
+#: app/templates/index2.html:33
+msgid "Logout"
+msgstr "Wyloguj się"
 
 #: app/templates/index2.html:49
 msgid "Hello"
@@ -203,7 +197,7 @@ msgstr "Administrator serwisu został powiadomiony. Przepraszamy za niedogodnoś
 msgid "Turn off 2FA"
 msgstr "Wyłącz 2FA"
 
-#: app/templates/settings/settings.html:10 app/templates/twofa/turn_on.html:21
+#: app/templates/settings/settings.html:10 app/templates/twofa/turn_on.html:19
 msgid "Turn on 2FA"
 msgstr "Włącz 2FA"
 
@@ -219,66 +213,70 @@ msgstr ""
 "Logowanie nie wymaga już podawanie kodu 2FA. Rozważ włączenie tej opcji "
 "ponownie z uwagi na bezpieczeństwo."
 
-#: app/templates/twofa/turn_on.html:24
+#: app/templates/twofa/turn_on.html:21
 msgid "You are activating two factor authentication."
 msgstr "Aktywujesz uwierzytelnianie dwuskładnikowe."
 
-#: app/templates/twofa/turn_on.html:25
+#: app/templates/twofa/turn_on.html:23
 msgid "Please keep the secret private."
 msgstr "Nie przekazuj tego kodu innym."
 
-#: app/templates/twofa/turn_on.html:28
-msgid "Turned on 2FA."
-msgstr "Włączono uwierzytelnianie dwuskładnikowe."
+#: app/templates/twofa/turn_on.html:24
+msgid "Scan the QR and type the code from app below."
+msgstr "Zeskanuj kod QR i przepisz wygenerowany kod."
 
-#: app/templates/twofa/turn_on.html:29
-msgid "You could go to the main page."
-msgstr "Możesz przejść do strony głównej."
+#: app/templates/twofa/turn_on.html:25
+msgid "Use an OTP app, e.g. Authy or Google Authenticator."
+msgstr "Użyj aplikacji, np. Authy lub Google Authenticator."
 
-#: app/templates/twofa/turn_on.html:32
-msgid "Invalid OTP code!"
-msgstr "Niepoprawny kod!"
-
-#: app/templates/twofa/turn_on.html:33
-msgid "Try again."
-msgstr "Spróbuj ponownie."
-
-#: app/templates/twofa/turn_on.html:36
-msgid "An error occured."
-msgstr "Wystąpił błąd."
-
-#: app/templates/twofa/turn_on.html:37
-msgid "Please contact the administrator."
-msgstr "Proszę skontaktować się z administratorem."
-
-#: app/templates/twofa/turn_on.html:44
+#: app/templates/twofa/turn_on.html:31
 msgid "Show secret as text"
 msgstr "Pokaż jako tekst"
 
-#: app/templates/twofa/turn_on.html:45
-msgid "Show QR Code"
-msgstr "Pokaż kod QR"
-
-#: app/templates/twofa/turn_on.html:47
-msgid "OTP code: "
-msgstr "Kod: "
-
-#: app/templates/twofa/turn_on.html:54
+#: app/templates/twofa/turn_on.html:43
 msgid "I understand"
 msgstr "Rozumiem"
 
-#: app/twofa/forms.py:8 app/twofa/forms.py:13
+#: app/twofa/forms.py:8
 msgid "Code: "
 msgstr "Kod: "
 
-#: app/twofa/routes.py:46
+#: app/twofa/routes.py:53
 msgid "2FA"
 msgstr "2FA"
 
-#: app/twofa/routes.py:128
+#: app/twofa/routes.py:144
 msgid "Invalid token!"
 msgstr "Niepoprawny token!"
 
-#: app/twofa/routes.py:145
+#: app/twofa/routes.py:161
 msgid "Invalid OTP code"
 msgstr "Niepoprawny kod OTP"
+
+#~ msgid "Login"
+#~ msgstr "Zaloguj się"
+
+#~ msgid "Turned on 2FA."
+#~ msgstr "Włączono uwierzytelnianie dwuskładnikowe."
+
+#~ msgid "You could go to the main page."
+#~ msgstr "Możesz przejść do strony głównej."
+
+#~ msgid "Invalid OTP code!"
+#~ msgstr "Niepoprawny kod!"
+
+#~ msgid "Try again."
+#~ msgstr "Spróbuj ponownie."
+
+#~ msgid "An error occured."
+#~ msgstr "Wystąpił błąd."
+
+#~ msgid "Please contact the administrator."
+#~ msgstr "Proszę skontaktować się z administratorem."
+
+#~ msgid "Show QR Code"
+#~ msgstr "Pokaż kod QR"
+
+#~ msgid "OTP code: "
+#~ msgstr "Kod: "
+

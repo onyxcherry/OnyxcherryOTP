@@ -17,7 +17,8 @@ from flask import (
     request,
     url_for,
 )
-from flask_babel import _
+from flask_babel import _, gettext
+from flask_babel import lazy_gettext as _l
 from flask_login import (
     current_user,
     fresh_login_required,
@@ -74,10 +75,8 @@ def generate_token():
         name=user.email, issuer_name="Onyxcherry OTP"
     )
 
-    status = "OK"
-    # TO-DO: verify the reason of returnning status
     response = {
-        "status": status,
+        "status": "OK",
         "secret": current_otp_secret,
         "app_qrcode": app_qrcode_source,
     }
@@ -89,22 +88,33 @@ def generate_token():
 def checkcode():
     if current_user.is_anonymous:
         abort(401)
+    status = "NOT"
+    message = (
+        f"{_('An error occured.')} {_('Please contact the administrator.')}"
+    )
     user_id = current_user.get_id()
     database_id = User.get_database_id(user_id)
     user_otp = OTP.query.filter_by(user_id=database_id).first()
-    if user_otp.is_valid == 1:
-        return "2FA is enabled."
+    if user_otp.is_valid is True:
+        message = "2FA is enabled."
     latest = pyotp.TOTP(user_otp.secret).verify(request.data.decode())
     previous = (
         pyotp.TOTP(user_otp.secret).at(datetime.now() - timedelta(seconds=30))
         == request.data.decode()
     )
-    if (latest or previous) and user_otp.is_valid is False:
+    if latest or previous:
         user_otp.is_valid = 1
         db.session.add(user_otp)
         db.session.commit()
-        return "OK"
-    return "NOT"
+        status = "OK"
+        message = (
+            f"{_l('Turned on 2FA.')} {_l('You could go to the main page.')}"
+        )
+    else:
+        status = "NOT"
+        message = f"{gettext('Invalid OTP code!')} {_('Try again.')}"
+    response = {"status": status, "message": message}
+    return jsonify(response)
 
 
 def check_last_otp_code(secret: str, code: str) -> bool:
