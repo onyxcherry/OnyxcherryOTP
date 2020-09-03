@@ -73,10 +73,10 @@ OnyxcherryOTP uses SendGrid to sending emails. Set `MAIL_LOCALHOST=True` in the 
 
 ### TO-DO:
 
-* Add `revoke other sessions` button
-* Temporarily block user account due to security reasons (and sign in through email)
-* Add alternative way to 2FA authenticate (backup codes)
-* Add custom front-end (panels)
+- [x] Add `revoke other sessions` button
+- [x] Add custom front-end (panels)
+- [ ] Temporarily block user account due to security reasons (and sign in through email)
+- [ ] Add alternative way to 2FA authenticate (backup codes)
 
 ### Credits:
 

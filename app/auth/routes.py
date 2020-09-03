@@ -238,12 +238,13 @@ def refresh_login():
     )
 
 
-@bp.route("/change_session")
+@bp.route("/revoke")
 @login_required
-def change_session():
+def revoke_other_sessions():
     got_id = current_user.get_id()
-    user_database_id = User.get_database_id(current_user.get_id())
+    user_database_id = User.get_database_id(got_id)
     user = User.query.filter_by(did=user_database_id).first()
     change_session_id(user)
     login_user(user)
-    return "Changed"
+    flash(_("Revoked other sessions."))
+    return redirect(url_for("main.index"))

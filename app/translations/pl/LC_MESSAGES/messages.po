@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.4.2\n"
 "Report-Msgid-Bugs-To: tomek@onyxcherry.pl\n"
-"POT-Creation-Date: 2020-09-03 20:38+0200\n"
+"POT-Creation-Date: 2020-09-03 21:46+0200\n"
 "PO-Revision-Date: 2020-06-21 10:53+0200\n"
 "Last-Translator: Tomasz Wiśniewski tomek@onyxcherry.pl\n"
 "Language: pl\n"
@@ -81,7 +81,8 @@ msgstr "Powtórz hasło"
 msgid "Reset my password"
 msgstr "Zresetuj moje hasło"
 
-#: app/auth/forms.py:74 app/twofa/forms.py:9
+#: app/auth/forms.py:74 app/templates/twofa/turn_on.html:45
+#: app/twofa/forms.py:9
 msgid "Submit"
 msgstr "Zatwierdź"
 
@@ -121,11 +122,15 @@ msgstr "Niepoprawne hasło"
 msgid "Refresh your session"
 msgstr "Odnów swoją sesję"
 
-#: app/main/routes.py:12 app/templates/index.html:27
+#: app/auth/routes.py:249
+msgid "Revoked other sessions."
+msgstr "Unieważniono pozostałe sesje."
+
+#: app/main/routes.py:11 app/templates/index.html:27
 msgid "Home"
 msgstr "Strona główna"
 
-#: app/main/routes.py:25 app/main/routes.py:30 app/templates/index.html:29
+#: app/main/routes.py:23 app/main/routes.py:28 app/templates/index.html:29
 #: app/templates/settings/settings.html:4
 msgid "Settings"
 msgstr "Ustawienia"
@@ -205,6 +210,10 @@ msgstr "Wyłącz 2FA"
 msgid "Turn on 2FA"
 msgstr "Włącz 2FA"
 
+#: app/templates/settings/settings.html:16
+msgid "Revoke other sessions"
+msgstr "Unieważnij pozostałe sesje"
+
 #: app/templates/twofa/deactivated.html:4
 msgid "Deactivated 2FA"
 msgstr "Wyłączono 2FA"
@@ -245,27 +254,27 @@ msgstr "Rozumiem"
 msgid "Code: "
 msgstr "Kod: "
 
-#: app/twofa/routes.py:53
+#: app/twofa/routes.py:52
 msgid "2FA"
 msgstr "2FA"
 
-#: app/twofa/routes.py:99
+#: app/twofa/routes.py:98
 msgid "An error occured. Please contact the administrator."
 msgstr "Wystąpił błąd. Skontaktuj się z administratorem."
 
-#: app/twofa/routes.py:115
+#: app/twofa/routes.py:114
 msgid "Turned on 2FA. You could go to the main page."
 msgstr "Włączono 2FA. Możesz przejść do strony głównej."
 
-#: app/twofa/routes.py:118
+#: app/twofa/routes.py:117
 msgid "Invalid OTP code! Try again."
 msgstr "Niepoprawny kod! Spróbuj ponownie."
 
-#: app/twofa/routes.py:141
+#: app/twofa/routes.py:140
 msgid "Invalid token!"
 msgstr "Niepoprawny token!"
 
-#: app/twofa/routes.py:158
+#: app/twofa/routes.py:157
 msgid "Invalid OTP code"
 msgstr "Niepoprawny kod OTP"
 
