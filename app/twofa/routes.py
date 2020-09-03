@@ -43,6 +43,11 @@ def generate_base32_secret():
 @login_required
 @fresh_login_required
 def activate():
+    user_id = current_user.get_id()
+    database_id = User.get_database_id(user_id)
+    otp = OTP.query.filter_by(user_id=database_id).first()
+    if otp and otp.is_valid is True:
+        return redirect(url_for("main.settings"))
     form = CheckOTPCode()
     return render_template("twofa/turn_on.html", title=_("2FA"), form=form)
 
@@ -88,14 +93,13 @@ def generate_token():
 def checkcode():
     if current_user.is_anonymous:
         abort(401)
+    # Default message in case of any problem
     status = "NOT"
-    message = (
-        f"{_('An error occured.')} {_('Please contact the administrator.')}"
-    )
+    message = _l("An error occured. Please contact the administrator.")
     user_id = current_user.get_id()
     database_id = User.get_database_id(user_id)
     user_otp = OTP.query.filter_by(user_id=database_id).first()
-    if user_otp.is_valid is True:
+    if user_otp and user_otp.is_valid is True:
         message = "2FA is enabled."
     latest = pyotp.TOTP(user_otp.secret).verify(request.data.decode())
     previous = (
@@ -107,12 +111,10 @@ def checkcode():
         db.session.add(user_otp)
         db.session.commit()
         status = "OK"
-        message = (
-            f"{_l('Turned on 2FA.')} {_l('You could go to the main page.')}"
-        )
+        message = _l("Turned on 2FA. You could go to the main page.")
     else:
         status = "NOT"
-        message = f"{gettext('Invalid OTP code!')} {_('Try again.')}"
+        message = _l("Invalid OTP code! Try again.")
     response = {"status": status, "message": message}
     return jsonify(response)
 

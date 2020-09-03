@@ -7,11 +7,8 @@ from flask_login import current_user, login_required
 
 @bp.route("/")
 @bp.route("/index")
-# @login_required
 def index():
-    return render_template(
-        "index2.html", title=_("Home"), default_content=True
-    )
+    return render_template("index.html", title=_("Home"), default_content=True)
 
 
 @bp.route("/settings")

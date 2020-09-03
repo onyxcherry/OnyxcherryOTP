@@ -1,20 +1,25 @@
-{% extends "index2.html" %}
+{% extends "index.html" %}
 
 {% block content %}
 <style>
     #twofa-text-code,
-    #twofa-qrcodeAAA,
-    #change-viewAAA,
-    #otp_code_form {
+    #twofa-qrcode,
+    #change-view,
+    #otp_code_form,
+    #twofa-helper {
         display: none;
     }
 
-    #change-viewAAA {
+    #change-view {
         max-width: 20em;
         left: 50%;
         margin: 0 auto;
         font-size: 1.2em;
     }
+
+    /* .mb-auto, .my-auto {
+    margin-bottom: 0!important;
+} */
 </style>
 <h1>{{ _('Turn on 2FA') }}</h1>
 
@@ -24,11 +29,11 @@
 <p id="twofa-helper" class="alert alert-dark">{{ _('Scan the QR and type the code from app below.') }}
     {{ _('Use an OTP app, e.g. Authy or Google Authenticator.') }}</p>
 
-<div id="twofa-qrcodeAAA"></div>
+<div id="twofa-qrcode"></div>
 <div id="twofa-text-code" class="lead"></div>
 
 <p class="lead">
-<div id="change-viewAAA" class="btn btn-sm btn-secondary"><b>{{ _('Show secret as text') }}</div>
+<div id="change-view" class="btn btn-sm btn-secondary"><b>{{ _('Show secret as text') }}</div>
 </p>
 
 <p></p>

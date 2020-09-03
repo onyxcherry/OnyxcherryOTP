@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.4.2\n"
 "Report-Msgid-Bugs-To: tomek@onyxcherry.pl\n"
-"POT-Creation-Date: 2020-09-02 20:26+0200\n"
+"POT-Creation-Date: 2020-09-03 20:38+0200\n"
 "PO-Revision-Date: 2020-06-21 10:53+0200\n"
 "Last-Translator: Tomasz Wiśniewski tomek@onyxcherry.pl\n"
 "Language: pl\n"
@@ -45,7 +45,7 @@ msgstr "Hasło"
 msgid "Remember me"
 msgstr "Zapamiętaj mnie"
 
-#: app/auth/forms.py:19 app/templates/index2.html:31
+#: app/auth/forms.py:19 app/templates/index.html:31
 msgid "Sign in"
 msgstr "Zaloguj się"
 
@@ -121,16 +121,16 @@ msgstr "Niepoprawne hasło"
 msgid "Refresh your session"
 msgstr "Odnów swoją sesję"
 
-#: app/main/routes.py:13 app/templates/index2.html:27
+#: app/main/routes.py:12 app/templates/index.html:27
 msgid "Home"
 msgstr "Strona główna"
 
-#: app/main/routes.py:26 app/main/routes.py:31 app/templates/index2.html:29
+#: app/main/routes.py:25 app/main/routes.py:30 app/templates/index.html:29
 #: app/templates/settings/settings.html:4
 msgid "Settings"
 msgstr "Ustawienia"
 
-#: app/templates/base_better.html:10 app/templates/index2.html:9
+#: app/templates/base.html:10 app/templates/index.html:9
 msgid "Welcome to Onyxcherry OTP"
 msgstr "Witaj w serwisie Onyxcherry OTP"
 
@@ -142,28 +142,32 @@ msgstr "Warunki użytkowania."
 msgid "Privacy policy"
 msgstr "Polityka prywatności"
 
-#: app/templates/index2.html:33
+#: app/templates/index.html:33
 msgid "Logout"
 msgstr "Wyloguj się"
 
-#: app/templates/index2.html:49
+#: app/templates/index.html:49
 msgid "Hello"
 msgstr "Cześć"
 
-#: app/templates/index2.html:50
+#: app/templates/index.html:50
 msgid ""
 "This is my implementation of two-factor authentication app in Flask with "
 "required fresh login,\n"
 "        revoking other sessions and translations handled by Flask-Babel."
 msgstr ""
+"To moja implementacja aplikacji z uwierzytelnianiem dwuskładnikowym "
+"opartej na Flasku, wymagającej świeżej sesji do kluczowych operacji, "
+"pozwalającej na unieważnienie pozostałych sesji oraz zapewniającej "
+"tłumaczenia dzięki Flask-Babel."
 
-#: app/templates/index2.html:52
+#: app/templates/index.html:52
 msgid "Get more informations below:"
-msgstr ""
+msgstr "Uzyskaj więcej informacji poniżej:"
 
-#: app/templates/index2.html:54
+#: app/templates/index.html:54
 msgid "Check source"
-msgstr ""
+msgstr "Sprawdź"
 
 #: app/templates/auth/login.html:22
 msgid "Forgot your password?"
@@ -197,7 +201,7 @@ msgstr "Administrator serwisu został powiadomiony. Przepraszamy za niedogodnoś
 msgid "Turn off 2FA"
 msgstr "Wyłącz 2FA"
 
-#: app/templates/settings/settings.html:10 app/templates/twofa/turn_on.html:19
+#: app/templates/settings/settings.html:10 app/templates/twofa/turn_on.html:24
 msgid "Turn on 2FA"
 msgstr "Włącz 2FA"
 
@@ -213,27 +217,27 @@ msgstr ""
 "Logowanie nie wymaga już podawanie kodu 2FA. Rozważ włączenie tej opcji "
 "ponownie z uwagi na bezpieczeństwo."
 
-#: app/templates/twofa/turn_on.html:21
+#: app/templates/twofa/turn_on.html:26
 msgid "You are activating two factor authentication."
 msgstr "Aktywujesz uwierzytelnianie dwuskładnikowe."
 
-#: app/templates/twofa/turn_on.html:23
+#: app/templates/twofa/turn_on.html:28
 msgid "Please keep the secret private."
 msgstr "Nie przekazuj tego kodu innym."
 
-#: app/templates/twofa/turn_on.html:24
+#: app/templates/twofa/turn_on.html:29
 msgid "Scan the QR and type the code from app below."
 msgstr "Zeskanuj kod QR i przepisz wygenerowany kod."
 
-#: app/templates/twofa/turn_on.html:25
+#: app/templates/twofa/turn_on.html:30
 msgid "Use an OTP app, e.g. Authy or Google Authenticator."
 msgstr "Użyj aplikacji, np. Authy lub Google Authenticator."
 
-#: app/templates/twofa/turn_on.html:31
+#: app/templates/twofa/turn_on.html:36
 msgid "Show secret as text"
 msgstr "Pokaż jako tekst"
 
-#: app/templates/twofa/turn_on.html:43
+#: app/templates/twofa/turn_on.html:48
 msgid "I understand"
 msgstr "Rozumiem"
 
@@ -245,38 +249,23 @@ msgstr "Kod: "
 msgid "2FA"
 msgstr "2FA"
 
-#: app/twofa/routes.py:144
+#: app/twofa/routes.py:99
+msgid "An error occured. Please contact the administrator."
+msgstr "Wystąpił błąd. Skontaktuj się z administratorem."
+
+#: app/twofa/routes.py:115
+msgid "Turned on 2FA. You could go to the main page."
+msgstr "Włączono 2FA. Możesz przejść do strony głównej."
+
+#: app/twofa/routes.py:118
+msgid "Invalid OTP code! Try again."
+msgstr "Niepoprawny kod! Spróbuj ponownie."
+
+#: app/twofa/routes.py:141
 msgid "Invalid token!"
 msgstr "Niepoprawny token!"
 
-#: app/twofa/routes.py:161
+#: app/twofa/routes.py:158
 msgid "Invalid OTP code"
 msgstr "Niepoprawny kod OTP"
-
-#~ msgid "Login"
-#~ msgstr "Zaloguj się"
-
-#~ msgid "Turned on 2FA."
-#~ msgstr "Włączono uwierzytelnianie dwuskładnikowe."
-
-#~ msgid "You could go to the main page."
-#~ msgstr "Możesz przejść do strony głównej."
-
-#~ msgid "Invalid OTP code!"
-#~ msgstr "Niepoprawny kod!"
-
-#~ msgid "Try again."
-#~ msgstr "Spróbuj ponownie."
-
-#~ msgid "An error occured."
-#~ msgstr "Wystąpił błąd."
-
-#~ msgid "Please contact the administrator."
-#~ msgstr "Proszę skontaktować się z administratorem."
-
-#~ msgid "Show QR Code"
-#~ msgstr "Pokaż kod QR"
-
-#~ msgid "OTP code: "
-#~ msgstr "Kod: "
 

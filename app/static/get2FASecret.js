@@ -1,11 +1,12 @@
 const base_url = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`
 var already_showed_qrcode = false;
 const twofa_messages = document.getElementById('twofa-messages')
+const twofa_helper = document.getElementById('twofa-helper')
 const otp_code_form = document.getElementById('otp_code_form')
-const twofa_qrcode = document.getElementById('twofa-qrcodeAAA')
+const twofa_qrcode = document.getElementById('twofa-qrcode')
 const twofa_text_code = document.getElementById('twofa-text-code')
 const get_token_button = document.getElementById('get-token-button')
-const change_view_buttonAAA = document.getElementById('change-viewAAA')
+const change_view_button = document.getElementById('change-view')
 
 
 check_code_form = document.getElementById('otp_code_form')
@@ -39,8 +40,9 @@ async function submitForm(e, form) {
 
     if (status === 'OK') {
         otp_code_form.style.display = 'none'
-        change_view_buttonAAA.style.display = 'none'
+        change_view_button.style.display = 'none'
         get_token_button.style.display = 'none'
+        twofa_helper.style.display = 'none'
         twofa_qrcode.style.display = 'none'
         twofa_text_code.style.display = 'none'
     }
@@ -55,26 +57,27 @@ async function getJsonData(url) {
     catch (error) { return console.log(error) }
 }
 
-function change_viewAAAAAAA() {
+function change_view() {
     if (already_showed_qrcode) {
-        showTextCodeAAA();
+        showTextCode();
         already_showed_qrcode = false;
     }
     else {
-        showQRCodeAAA();
+        showQRCode();
         already_showed_qrcode = true;
     }
 }
 
-change_view_buttonAAA.addEventListener('click', () => {
-    change_viewAAAAAAA()
+change_view_button.addEventListener('click', () => {
+    change_view()
 })
 
 get_token_button.addEventListener('click', () => {
     createQRCode()
-    change_viewAAAAAAA()
+    change_view()
+    twofa_helper.style.display = 'block'
     otp_code_form.style.display = 'block'
-    change_view_buttonAAA.style.display = 'block'
+    change_view_button.style.display = 'block'
     get_token_button.style.display = 'none'
     twofa_messages.style.display = 'none'
 })
@@ -96,15 +99,15 @@ async function createQRCode() {
 
 }
 
-function showQRCodeAAA() {
+function showQRCode() {
     twofa_qrcode.style.display = 'block'
     twofa_text_code.style.display = 'none'
-    change_view_buttonAAA.innerText = 'Show secret as text'
+    change_view_button.innerText = 'Show secret as text'
 }
 
-function showTextCodeAAA() {
+function showTextCode() {
     twofa_qrcode.style.display = 'none'
     twofa_text_code.style.display = 'block'
-    change_view_buttonAAA.innerText = 'Show QR Code'
+    change_view_button.innerText = 'Show QR Code'
 
 }
