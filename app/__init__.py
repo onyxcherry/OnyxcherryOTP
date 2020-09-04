@@ -3,11 +3,11 @@ from flask import Flask, current_app, render_template, request
 from flask_babel import Babel
 from flask_babel import lazy_gettext as _l
 from flask_bcrypt import Bcrypt
-from flask_bootstrap import Bootstrap
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
 
 db = SQLAlchemy()
@@ -25,10 +25,25 @@ login.needs_refresh_message_category = "info"
 # cookie by remember-me option
 
 mail = Mail()
-bootstrap = Bootstrap()
 bcrypt = Bcrypt()
 babel = Babel()
 csrf = CSRFProtect()
+talisman = Talisman()
+
+
+csp = {
+    "default-src": "'self'",
+    "script-src": ["'strict-dynamic'", "'unsafe-inline'", "http:", "https:"],
+    "style-src": [
+        "'self'",
+        "'unsafe-inline'",
+        "https://stackpath.bootstrapcdn.com",
+    ],
+    "object-src": "'none'",
+    "base-uri": "'none'",
+    "require-trusted-types-for": "'script'",
+    "report-uri": "https://onyxcherryotp.report-uri.com/r/d/csp/enforce",
+}
 
 
 def page_not_found(e):
@@ -47,9 +62,14 @@ def create_app(config_class=Config):
     db.init_app(app)
     login.init_app(app)
     mail.init_app(app)
-    bootstrap.init_app(app)
     csrf.init_app(app)
     babel.init_app(app)
+    talisman.init_app(
+        app,
+        content_security_policy=csp,
+        content_security_policy_nonce_in=["script-src"],
+    )
+
     with app.app_context():
         if db.engine.url.drivername == "sqlite":
             migrate.init_app(app, db, render_as_batch=True)

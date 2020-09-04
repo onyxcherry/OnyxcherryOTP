@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from typing import Tuple
 
 import jwt
 import pyotp

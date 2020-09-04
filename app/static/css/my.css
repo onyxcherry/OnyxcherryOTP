@@ -1,0 +1,14 @@
+#twofa-text-code,
+#twofa-qrcode,
+#change-view,
+#otp_code_form,
+#twofa-helper {
+    display: none;
+}
+
+#change-view {
+    max-width: 20em;
+    left: 50%;
+    margin: 0 auto;
+    font-size: 1.2em;
+}

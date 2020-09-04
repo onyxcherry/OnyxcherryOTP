@@ -2,7 +2,7 @@
 
 {% block content %}
 <h1>{{ _('Settings') }}</h1>
-<img id="2fa-image" src="{{ url_for('static', filename='2fa.png') }}">
+<img id="2fa-image" src="/static/images/2fa.png">
 <p></p>
 {% if twofa_enabled %}
 <a href="{{ url_for('twofa.deactivate') }}" class="btn btn-warning">{{ _('Turn off 2FA') }}</a>

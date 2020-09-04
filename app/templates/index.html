@@ -8,13 +8,11 @@
   <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
   <title>{% if title %}{{ title }} - Onyxcherry OTP{% else %}{{ _('Welcome to Onyxcherry OTP') }}{% endif %}</title>
 
-  <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/cover/">
-
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-    integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous" nonce="{{ csp_nonce() }}">
 
-  <link href="/static/css/cover.css" rel="stylesheet">
+  <link href="/static/css/cover.css" rel="stylesheet" nonce="{{ csp_nonce() }}">
 </head>
 
 <body class="text-center">

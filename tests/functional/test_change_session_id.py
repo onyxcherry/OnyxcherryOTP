@@ -6,7 +6,7 @@ def test_change_session_id(test_client, init_database):
     response = sign_in_no_fr(test_client, "dave", "wselfknskjdksdaiujlj")
     session_header = response.headers.get("Set-Cookie")
     old_session = session_header.split()[0].split("=")[1]
-    change_session_id_response = test_client.get("/auth/revoke")
+    test_client.get("/auth/revoke")
     checking_response = get_index(test_client)
     assert b"Hello, dave" in checking_response.data
     delete_session_cookie(test_client)

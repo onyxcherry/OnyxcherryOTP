@@ -1,26 +1,8 @@
 {% extends "index.html" %}
 
 {% block content %}
-<style>
-    #twofa-text-code,
-    #twofa-qrcode,
-    #change-view,
-    #otp_code_form,
-    #twofa-helper {
-        display: none;
-    }
+<link href="/static/css/my.css" rel="stylesheet" nonce="{{ csp_nonce() }}">
 
-    #change-view {
-        max-width: 20em;
-        left: 50%;
-        margin: 0 auto;
-        font-size: 1.2em;
-    }
-
-    /* .mb-auto, .my-auto {
-    margin-bottom: 0!important;
-} */
-</style>
 <h1>{{ _('Turn on 2FA') }}</h1>
 
 <p id="head-message" class="lead">{{ _('You are activating two factor authentication.') }}</p>
@@ -45,8 +27,8 @@
     <input class="btn btn-info btn-lg" id="submit" name="submit" type="submit" value="{{ _('Submit') }}">
 </form>
 
-<div id="get-token-button" class="btn btn-primary btn-lg" style="margin-top: 20px;">{{ _('I understand') }}</div>
+<div id="get-token-button" class="btn btn-primary btn-lg" style="margin-top: 20px;" nonce="{{ csp_nonce() }}">{{ _('I understand') }}</div>
 
-<script src="/static/qrcode.min.js" async defer></script>
-<script src="/static/get2FASecret.js" async defer></script>
+<script src="/static/js/qrcode.min.js" async defer nonce="{{ csp_nonce() }}"></script>
+<script src="/static/js/turn_on_twofa.js" async defer nonce="{{ csp_nonce() }}"></script>
 {% endblock %}

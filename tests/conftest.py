@@ -1,5 +1,3 @@
-from random import SystemRandom
-
 import pyotp
 import pytest
 from app import Config, create_app, db
