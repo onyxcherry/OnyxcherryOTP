@@ -1,19 +1,24 @@
 FROM python:3.8.5-slim-buster
 
-RUN adduser --disabled-password onyxcherry
+RUN adduser --disabled-password --gecos "" onyxcherry
 WORKDIR /home/onyxcherry
 
-COPY requirements.txt requirements.txt
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y git
+    apt-get install -y --no-install-recommends git
+
+COPY requirements.txt requirements.txt
+
+
 RUN python -m venv venv
 RUN venv/bin/pip install -r requirements.txt
 RUN venv/bin/pip install gunicorn psycopg2-binary flask-migrate
+
 COPY app app
 COPY migrations migrations
 COPY onyxcherryotp.py config.py boot.sh ./
 COPY sample.env .env
+
 RUN chmod +x boot.sh
 
 ENV FLASK_APP onyxcherryotp.py
