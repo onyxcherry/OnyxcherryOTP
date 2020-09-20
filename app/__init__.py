@@ -1,4 +1,8 @@
-from config import Config
+import os
+from dataclasses import dataclass
+
+from config import Config, CSPSettings
+from dotenv import load_dotenv
 from flask import Flask, current_app, render_template, request
 from flask_babel import Babel
 from flask_babel import lazy_gettext as _l
@@ -31,21 +35,6 @@ csrf = CSRFProtect()
 talisman = Talisman()
 
 
-csp = {
-    "default-src": "'self'",
-    "script-src": ["'strict-dynamic'", "'unsafe-inline'", "http:", "https:"],
-    "style-src": [
-        "'self'",
-        "'unsafe-inline'",
-        "https://stackpath.bootstrapcdn.com",
-    ],
-    "object-src": "'none'",
-    "base-uri": "'none'",
-    "require-trusted-types-for": "'script'",
-    "report-uri": "https://onyxcherryotp.report-uri.com/r/d/csp/enforce",
-}
-
-
 def page_not_found(e):
     return render_template("errors/404.html"), 404
 
@@ -64,10 +53,22 @@ def create_app(config_class=Config):
     mail.init_app(app)
     csrf.init_app(app)
     babel.init_app(app)
+
+    csp = CSPSettings()
     talisman.init_app(
         app,
-        content_security_policy=csp,
-        content_security_policy_nonce_in=["script-src"],
+        content_security_policy=csp.content_security_policy,
+        content_security_policy_nonce_in=csp.content_security_policy_nonce_in,
+        force_https=csp.force_https,
+        frame_options=csp.frame_options,
+        session_cookie_secure=csp.session_cookie_secure,
+        session_cookie_http_only=csp.session_cookie_http_only,
+        # content_security_policy=A.csp,
+        # content_security_policy_nonce_in=["script-src"],
+        # force_https=HTTPS_ENABLED,
+        # frame_options="DENY",
+        # session_cookie_secure=HTTPS_ENABLED,
+        # session_cookie_http_only=True,
     )
 
     with app.app_context():
