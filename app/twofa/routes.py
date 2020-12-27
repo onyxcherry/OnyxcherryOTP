@@ -100,11 +100,10 @@ def checkcode():
     user_otp = OTP.query.filter_by(user_id=database_id).first()
     if user_otp and user_otp.is_valid is True:
         message = "2FA is enabled."
-    latest = pyotp.TOTP(user_otp.secret).verify(request.data.decode())
-    previous = (
-        pyotp.TOTP(user_otp.secret).at(datetime.now() - timedelta(seconds=30))
-        == request.data.decode()
-    )
+    latest = pyotp.TOTP(user_otp.secret).verify(request.form.get("otp_code"))
+    previous = pyotp.TOTP(user_otp.secret).at(
+        datetime.now() - timedelta(seconds=30)
+    ) == request.form.get("otp_code")
     if latest or previous:
         user_otp.is_valid = 1
         db.session.add(user_otp)

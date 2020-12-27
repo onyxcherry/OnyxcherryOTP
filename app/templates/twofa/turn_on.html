@@ -20,6 +20,7 @@
 
 <p></p>
 <form action="/twofa/checkcode" method="POST" id="otp_code_form" class="lead">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     {{ form.otp_code.label }}
 
     {{ form.otp_code(autofocus='autofocus', maxlength="6", size=6) }}

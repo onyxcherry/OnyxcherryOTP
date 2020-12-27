@@ -65,7 +65,6 @@ class Config(object):
         MAIL_PORT = "8465"
         os.environ["MAIL_SERVER"] = "localhost"
         os.environ["MAIL_PORT"] = "8465"
-        WTF_CSRF_ENABLED = False
 
     ADMINS = ["postmaster@onyxcherry.pl"]
 

@@ -15,13 +15,15 @@ check_code_form.addEventListener('submit', e => {
 })
 
 
-async function postFormData(url, value) {
+async function postFormData(url, otp_code, csrf_token) {
+    const myFormData = new FormData();
+
+    myFormData.append('otp_code', otp_code)
+    myFormData.append('csrf_token', csrf_token)
+
     const response = await fetch(url, {
         method: 'post',
-        headers: {
-            'Content-Type': 'text/plain'
-        },
-        body: value
+        body: myFormData
     });
     try {
         return response.json()
@@ -31,7 +33,7 @@ async function postFormData(url, value) {
 
 async function submitForm(e, form) {
     e.preventDefault();
-    const data = await postFormData(`${base_url}/twofa/checkcode`, form.otp_code.value);
+    const data = await postFormData(`${base_url}/twofa/checkcode`, form.otp_code.value, form.csrf_token.value);
     const status = data['status']
     const message = data['message']
 

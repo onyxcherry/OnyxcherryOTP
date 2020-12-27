@@ -9,7 +9,8 @@ def enable_user_2fa(test_client):
     jsoned_data = json.loads(token_data)
     otp_token = jsoned_data["secret"]
     otp_code = pyotp.TOTP(otp_token).now()
-    check_code_response = test_client.post("/twofa/checkcode", data=otp_code)
+    data = {"otp_code": otp_code, "csrf_token": "aaabbbccc"}
+    check_code_response = test_client.post("/twofa/checkcode", data=data)
     assert b"OK" in check_code_response.data
     assert check_code_response.status_code == 200
     return otp_token
