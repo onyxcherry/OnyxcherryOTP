@@ -1,3 +1,4 @@
+import base64
 import datetime
 import logging
 import os
@@ -17,37 +18,40 @@ if os.environ.get("HTTPS_ENABLED", "").lower() == "true":
 class CSPSettings:
     csp = {
         "default-src": "'self'",
-        "script-src": [
-            "'strict-dynamic'",
-            "'unsafe-inline'",
-            "http:",
-            "https:",
-        ],
-        "style-src": [
-            "'self'",
-            "'unsafe-inline'",
-            "https://stackpath.bootstrapcdn.com",
-        ],
+        "script-src": ["'strict-dynamic'"],
+        "style-src": ["'self'"],
+        "frame-src": ["https://www.google.com/recaptcha/"],
         "object-src": "'none'",
         "base-uri": "'none'",
-        "require-trusted-types-for": "'script'",
         "report-uri": "https://onyxcherryotp.report-uri.com/r/d/csp/enforce",
     }
     content_security_policy = csp
-    content_security_policy_nonce_in = ["script-src"]
+    content_security_policy_nonce_in = ["script-src", "style-src"]
     force_https = HTTPS_ENABLED
     frame_options = "DENY"
     session_cookie_secure = HTTPS_ENABLED
     session_cookie_http_only = True
+    strict_transport_security = True
+    referrer_policy = "strict-origin-when-cross-origin"
+
+    # Consider adding 'unsafe-inline'
+    # (ignored by browsers supporting nonces/hashes)
+    # to be backward compatible with older browsers.
+
+    # Consider adding https: and http: url schemes
+    # (ignored by browsers supporting 'strict-dynamic')
+    # to be backward compatible with older browsers.
+    # [https://csp-evaluator.withgoogle.com/]
 
 
 class Config(object):
     SECRET_KEY = (
-        os.environ.get("SECRET_KEY") or "random-string-if-not-specified-in-env"
+        os.environ.get("SECRET_KEY")
+        or base64.b64encode(os.urandom(32)).decode()
     )
     TWOFA_SECRET_KEY = (
         os.environ.get("TWOFA_SECRET_KEY")
-        or "another-random-string-if-not-specified-in-env"
+        or base64.b64encode(os.urandom(32)).decode()
     )
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "DATABASE_URL"
@@ -58,6 +62,11 @@ class Config(object):
     MAIL_PORT = int(os.environ.get("MAIL_PORT") or 465)
 
     TESTING = os.environ.get("TESTING") is not None
+
+    WTF_CSRF_ENABLED = os.environ.get("WTF_CSRF_ENABLED") or True
+
+    if TESTING:
+        WTF_CSRF_ENABLED = False
 
     # Note that emails isn't sending when TESTING is True
     if os.environ.get("MAIL_LOCALHOST") is not None or TESTING:
@@ -79,8 +88,19 @@ class Config(object):
     REMEMBER_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_SAMESITE = "Strict"  # might be not implented yet
 
-    RECAPTCHA_PUBLIC_KEY = os.environ.get("RECAPTCHA_PUBLIC_KEY")
-    RECAPTCHA_PRIVATE_KEY = os.environ.get("RECAPTCHA_PRIVATE_KEY")
+    # These recaptcha keys are test keys
+    # [https://developers.google.com/recaptcha/docs/faq
+    # #id-like-to-run-automated-tests-with-recaptcha.-what-should-i-do]
+
+    RECAPTCHA_PUBLIC_KEY = ""
+    RECAPTCHA_PUBLIC_KEY = (
+        os.environ.get("RECAPTCHA_PUBLIC_KEY")
+        or "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+    )
+    RECAPTCHA_PRIVATE_KEY = (
+        os.environ.get("RECAPTCHA_PRIVATE_KEY")
+        or "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"
+    )
 
     PREFERRED_URL_SCHEME = "https"
 

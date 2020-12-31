@@ -63,12 +63,8 @@ def create_app(config_class=Config):
         frame_options=csp.frame_options,
         session_cookie_secure=csp.session_cookie_secure,
         session_cookie_http_only=csp.session_cookie_http_only,
-        # content_security_policy=A.csp,
-        # content_security_policy_nonce_in=["script-src"],
-        # force_https=HTTPS_ENABLED,
-        # frame_options="DENY",
-        # session_cookie_secure=HTTPS_ENABLED,
-        # session_cookie_http_only=True,
+        strict_transport_security=csp.strict_transport_security,
+        referrer_policy=csp.referrer_policy,
     )
 
     with app.app_context():

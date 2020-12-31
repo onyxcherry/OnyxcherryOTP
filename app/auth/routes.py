@@ -19,6 +19,7 @@ from app.models import (
     generate_sid,
 )
 from app.twofa.forms import CheckOTPCode
+from config import HTTPS_ENABLED, Config
 from flask import (
     flash,
     make_response,
@@ -86,8 +87,8 @@ def login():
             response.set_cookie(
                 "token",
                 value=token,
-                max_age=60,
-                secure=False,
+                max_age=90,
+                secure=HTTPS_ENABLED,
                 httponly=True,
                 samesite="Strict",
             )
@@ -122,7 +123,10 @@ def register():
         flash(_("Congratulations, you are now a registered user!"))
         return redirect(url_for("auth.login"))
     return render_template(
-        "auth/register.html", title=_("Register"), form=form
+        "auth/register.html",
+        title=_("Register"),
+        form=form,
+        recaptcha_public_key=Config.RECAPTCHA_PUBLIC_KEY,
     )
 
 

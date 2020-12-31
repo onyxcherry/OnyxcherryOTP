@@ -28,7 +28,7 @@
     <input class="btn btn-info btn-lg" id="submit" name="submit" type="submit" value="{{ _('Submit') }}">
 </form>
 
-<div id="get-token-button" class="btn btn-primary btn-lg" style="margin-top: 20px;" nonce="{{ csp_nonce() }}">{{ _('I understand') }}</div>
+<div id="get-token-button" class="btn btn-primary btn-lg" nonce="{{ csp_nonce() }}">{{ _('I understand') }}</div>
 
 <script src="/static/js/qrcode.min.js" async defer nonce="{{ csp_nonce() }}"></script>
 <script src="/static/js/turn_on_twofa.js" async defer nonce="{{ csp_nonce() }}"></script>

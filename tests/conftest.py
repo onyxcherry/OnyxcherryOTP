@@ -10,7 +10,6 @@ class TestConfig(Config):
     WTF_CSRF_METHODS = []
     SQLALCHEMY_DATABASE_URI = "sqlite://"
     BCRYPT_LOG_ROUNDS = 4
-    WTF_CSRF_ENABLED = False
     SECRET_KEY = "s2yvxuwZ7Ipf5JKv6uV7y85AfJJdhhSPq65bKZtH7l4="
     TWOFA_SECRET_KEY = "cryG2D0C95mlO9r/rnple7FOdQhYsPL8boXB/qOXuPM="
 
