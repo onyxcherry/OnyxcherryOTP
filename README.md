@@ -11,6 +11,7 @@
 * Two latest OTP are valid
 * QR Code rendered at client-side (by a pure Javascript library)
 * Easy translations with Flask-Babel
+* Content Security Policy Level 3
 
 #### Since client get only secret code (asynchronous), it is no need to deal with images and its caching by robots etc.
 
@@ -59,24 +60,43 @@ flask shell
 >>> db.create_all()
 ```
 
-6. Generate and change app's secrets. Use
-
-``` bash
-python -c 'from os import urandom; from base64 import b64encode; print(b64encode(urandom(32)).decode("utf-8"))'
+### Run
+```
+flask run
 ```
 
-and change secrets in .env and in config.py to the generated above.
+or - on production - use [Gunicorn](https://gunicorn.org/).
 
-> WARNING: app is running on development environment
+---
+Alternatively - for development - run the app with https (generate own self-signed SSL certs with [mkcert](https://github.com/FiloSottile/mkcert) or [openssl](https://devcenter.heroku.com/articles/ssl-certificate-self)):
+```
+gunicorn --bind :5777 --certfile /path/to/server.crt --keyfile /path/to/server.key --access-logfile - --error-logfile - --reload onyxcherryotp:app
+```
 
-OnyxcherryOTP uses SendGrid to sending emails. Set `MAIL_LOCALHOST=True` in the .env if you want to send emails to localhost. Type `python3 -m smtpd -n -c DebuggingServer localhost:8465` in another console window.
+#### Running tests
+```
+pytest
+```
+(you might have typed `pip install -e .`)
+
+---
+
+OnyxcherryOTP uses SendGrid to sending emails. Set `MAIL_LOCALHOST=True` in the .env if you want to send emails to localhost.  
+Type 
+
+``` 
+python3 -m smtpd -n -c DebuggingServer localhost:8465`
+```
+
+in another console window.
 
 ### TO-DO:
 
-- [x] Add `revoke other sessions` button
-- [x] Add custom front-end (panels)
-- [ ] Temporarily block user account due to security reasons (and sign in through email)
-- [ ] Add alternative way to 2FA authenticate (backup codes)
+* [x] Add `revoke other sessions` button
+* [x] Add custom front-end (panels)
+* [ ] Temporarily block user account due to security reasons (and verify & sign in through email)
+* [ ] Add alternative way to 2FA authenticate (backup codes)
+* [ ] Add WebAuthn 
 
 ### Credits:
 
