@@ -1,0 +1,17 @@
+{% extends 'form_page.html' %}
+{% block forms %}
+<p>{{ _('Choose an authentication method below:') }}</p>
+
+{% if webauthn_available %}
+<button id="webauthn-button" class="btn btn-primary btn-lg">{{ _('Webauthn') }}</button>
+{% endif %}
+{% if otp_available %}
+<button id="otp-button" class="btn btn-primary btn-lg">{{ _('One Time Password') }}</button>
+{% endif %}
+{% if backup_code_available %}
+<button id="backup-code-button" class="btn btn-primary btn-lg">{{ _('Backup code') }}</button>
+{% endif %}
+
+<script src="/static/js/available_options.js" async defer nonce="{{ csp_nonce() }}"></script>
+
+{% endblock %}

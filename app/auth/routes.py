@@ -15,12 +15,14 @@ from app.models import (
     OTP,
     ResetPassword,
     User,
+    Webauthn,
     change_session_id,
     generate_sid,
 )
 from app.twofa.forms import CheckOTPCode
 from config import HTTPS_ENABLED, Config
 from flask import (
+    abort,
     flash,
     make_response,
     redirect,
@@ -75,6 +77,22 @@ def login():
             return redirect(url_for("auth.login"))
         user_otp = OTP.query.filter_by(user_id=user.did).first()
         remember_me = form.remember_me.data
+
+        webauthn = Webauthn.query.filter_by(user_id=user.did).first()
+        if webauthn and webauthn.is_enabled is True:
+            token = user.set_valid_credentials(remember_me)
+            response = make_response(
+                render_template("webauthn/login_with_webauthn.html")
+            )
+            response.set_cookie(
+                "token",
+                value=token,
+                max_age=90,
+                secure=HTTPS_ENABLED,
+                httponly=True,
+                samesite="Strict",
+            )
+            return response
         if user_otp and user_otp.is_valid == 1:
             user_otp.remaining_attempts = 3
             db.session.add(user_otp)
@@ -252,3 +270,69 @@ def revoke_other_sessions():
     login_user(user)
     flash(_("Revoked other sessions."))
     return redirect(url_for("main.index"))
+
+
+@bp.route("/available_options")
+def available_options():
+    token = request.cookies.get("token")
+    if not token:
+        abort(401)
+    username, remember_me = User.verify_twofa_login_token(token.encode())
+    if not username:
+        flash(_("Invalid token!"))
+        return redirect(url_for("auth.login"))
+    user = User.query.filter_by(username=username).first()
+    database_id = user.did
+
+    webauthn_available = False
+    otp_available = False
+
+    webauthn = Webauthn.query.filter_by(user_id=database_id).first()
+    if webauthn and webauthn.is_enabled:
+        webauthn_available = True
+
+    otp = OTP.query.filter_by(user_id=database_id).first()
+    if otp and otp.is_valid:
+        otp_available = True
+
+    # Add backup codes in future
+
+    return render_template(
+        "auth/available_options.html",
+        webauthn_available=webauthn_available,
+        otp_available=otp_available,
+        backup_code_available=False,
+    )
+
+
+@bp.route("/use_otp")
+def use_otp():
+    token = request.cookies.get("token")
+    if not token:
+        abort(401)
+    username, remember_me = User.verify_twofa_login_token(token.encode())
+    if not username:
+        flash(_("Invalid token!"))
+        return redirect(url_for("auth.login"))
+    user = User.query.filter_by(username=username).first()
+    user_otp = OTP.query.filter_by(user_id=user.did).first()
+    if user_otp and user_otp.is_valid == 1:
+        form = CheckOTPCode()
+        return render_template("twofa/login_with_twofa.html", form=form)
+    return redirect(url_for("auth.login"))
+
+
+@bp.route("/use_webauthn")
+def use_webauthn():
+    token = request.cookies.get("token")
+    if not token:
+        abort(401)
+    username, remember_me = User.verify_twofa_login_token(token.encode())
+    if not username:
+        flash(_("Invalid token!"))
+        return redirect(url_for("auth.login"))
+    user = User.query.filter_by(username=username).first()
+    webauthn = Webauthn.query.filter_by(user_id=user.did).first()
+    if webauthn and webauthn.is_enabled is True:
+        return render_template("webauthn/login_with_webauthn.html")
+    return redirect(url_for("auth.login"))

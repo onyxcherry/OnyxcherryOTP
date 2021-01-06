@@ -30,6 +30,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     otp = db.relationship("OTP", backref="user", uselist=False)
+    webauthn = db.relationship("Webauthn", backref="user", uselist=False)
     reset_password_value = db.relationship(
         "ResetPassword", backref="user", uselist=False
     )
@@ -182,6 +183,18 @@ class ResetPassword(db.Model):
 
     def __repr__(self):
         return f"<ResetPasswordValue for user {self.user_id}>"
+
+
+class Webauthn(db.Model):
+    __tablename__ = "webauthn"
+    id = db.Column(db.Integer, primary_key=True)
+    number = db.Column(db.Integer, default=0)
+    credentials = db.Column(db.String(10000))
+    is_enabled = db.Column(db.Boolean, default=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.did"))
+
+    def __repr__(self):
+        return f"<Webauthn - {self.number} keys for user {self.user_id}>"
 
 
 @login.user_loader

@@ -102,6 +102,8 @@ class Config(object):
         or "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"
     )
 
+    RP_ID = os.environ.get("RP_ID") or "localhost"
+
     PREFERRED_URL_SCHEME = "https"
 
     # Very useful when debugging especially templates. Change to True if needed

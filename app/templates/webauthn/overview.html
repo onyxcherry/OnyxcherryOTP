@@ -1,0 +1,14 @@
+{% extends "index.html" %}
+
+{% block content %}
+<h1>{{ _('Webauthn') }}</h1>
+{% if webauthn_enabled %}
+<a href="{{ url_for('webauthn.deactivate') }}" class="btn btn-primary">{{ _('Turn off Webauthn') }}</a>
+{% else %}
+<a href="{{ url_for('webauthn.activate') }}" class="btn btn-warning">{{ _('Turn on Webauthn') }}</a>
+{% endif %}
+
+
+<a href="{{ url_for('webauthn.manage_keys') }}" class="btn btn-secondary">{{ _('Manage keys') }}</a>
+
+{% endblock %}
