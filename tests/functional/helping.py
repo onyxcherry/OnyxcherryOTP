@@ -1,6 +1,12 @@
 import json
 
 import pyotp
+from app.models import User, Webauthn
+from fido2 import cbor
+
+
+def activate_webauthn(test_client):
+    activate_webauthn_response = test_client.get("/webauthn/activate")
 
 
 def enable_user_2fa(test_client):

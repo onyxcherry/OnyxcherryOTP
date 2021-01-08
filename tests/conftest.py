@@ -1,7 +1,14 @@
+import pickle
+import uuid
+from datetime import datetime
+
 import pyotp
 import pytest
 from app import Config, create_app, db
-from app.models import User, generate_sid
+from app.models import User, Webauthn, generate_sid
+from app.webauthn.routes import encode_credentials_data_to_store
+from fido2.ctap2 import cbor
+from soft_webauthn import SoftWebauthnDevice
 
 
 class TestConfig(Config):
@@ -56,6 +63,24 @@ def init_database():
     db.session.add(user1)
     db.session.add(user2)
     db.session.add(user3)
+
+    user4 = User(username="mark", sid=generate_sid(), email="mark@gmail.com",)
+    user4.set_password("c1c149afbf4c8996fb92427ae41e4649b934ca")
+
+    user5 = User(
+        username="jennie", sid=generate_sid(), email="jennie@gmail.com",
+    )
+    user5.set_password("9df1c362e4df3e51edd1acde9")
+    db.session.add(user4)
+    db.session.add(user5)
+    db.session.commit()
+
+    got_user4 = User.query.filter_by(username="mark").first()
+    webauthn_for_user4 = Webauthn(
+        number=0, credentials="", is_enabled=True, user_id=got_user4.did
+    )
+
+    db.session.add(webauthn_for_user4)
 
     db.session.commit()
 

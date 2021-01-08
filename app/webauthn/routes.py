@@ -1,3 +1,30 @@
+# Copyright (c) 2018 Yubico AB
+# All rights reserved.
+#
+#   Redistribution and use in source and binary forms, with or
+#   without modification, are permitted provided that the following
+#   conditions are met:
+#
+#    1. Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#    2. Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+# COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
 from __future__ import absolute_import, print_function, unicode_literals
 
 import base64
@@ -10,7 +37,11 @@ from app.webauthn import bp
 from config import Config
 from fido2 import cbor
 from fido2.client import ClientData
-from fido2.ctap2 import AttestationObject, AuthenticatorData
+from fido2.ctap2 import (
+    AttestationObject,
+    AttestedCredentialData,
+    AuthenticatorData,
+)
 from fido2.server import Fido2Server
 from fido2.webauthn import PublicKeyCredentialRpEntity
 from flask import (
@@ -43,7 +74,7 @@ def get_next_page(next_from_request: str) -> str:
     return next_page
 
 
-def get_user_credential_data(user_database_id: int) -> dict:
+def get_credential_data(user_database_id: int) -> dict:
     webauthn = Webauthn.query.filter_by(user_id=user_database_id).first()
     if webauthn and webauthn.credentials:
         credential_blob = webauthn.credentials
@@ -53,16 +84,27 @@ def get_user_credential_data(user_database_id: int) -> dict:
     return credential_data
 
 
-def get_credential_data_to_store(credential_data: dict) -> str:
-    encoded_credentials = cbor.encode(credential_data)
-    data_to_store_in_database = base64.b64encode(encoded_credentials)
-    return data_to_store_in_database
+def get_credentials(user_database_id: int) -> list:
+    credential_data = get_credential_data(user_database_id)
+    encoded_keys = list(credential_data)
+    if not encoded_keys:
+        return []
+    decoded_keys = [cbor.decode(k) for k in encoded_keys]
+    credentials = make_credentials_from_data_second(decoded_keys)
+    return credentials
 
 
-def make_credentials_from_data(data: list) -> list:
+def encode_credentials_data_to_store(credential_data: dict) -> str:
+    return base64.b64encode(cbor.encode(credential_data))
+
+
+def make_credentials_from_data_second(data: list) -> list:
     credentials = []
     for d in data:
-        credentials.append(AttestationObject(d).auth_data.credential_data)
+        obj = AttestedCredentialData.create(
+            d["aaguid"], d["credential_id"], d["public_key"],
+        )
+        credentials.append(obj)
     return credentials
 
 
@@ -113,9 +155,7 @@ def register_begin():
     user = User.query.filter_by(did=user_database_id).first()
     username = user.username
 
-    credential_data = get_user_credential_data(user_database_id)
-    credential_blob = list(credential_data)
-    credentials = make_credentials_from_data(credential_blob)
+    credentials = get_credentials(user_database_id)
 
     webauthn_user_id = uuid.uuid4().hex.encode()
 
@@ -143,8 +183,6 @@ def register_complete():
     database_id = User.get_database_id(user_id)
 
     data = cbor.decode(request.get_data())
-    print(data)
-    blob_to_save = data["attestationObject"]
     client_data = ClientData(data["clientDataJSON"])
     att_obj = AttestationObject(data["attestationObject"])
 
@@ -152,18 +190,28 @@ def register_complete():
         session["state"], client_data, att_obj
     )
 
-    user_credential_data = get_user_credential_data(database_id)
-    user_credential_data[blob_to_save] = str(datetime.utcnow())
+    creds_parameters = {
+        "aaguid": auth_data.credential_data.aaguid,
+        "credential_id": auth_data.credential_data.credential_id,
+        "public_key": auth_data.credential_data.public_key,
+    }
+
+    credential_data = get_credential_data(database_id)
+    credential_data[cbor.encode(creds_parameters)] = str(datetime.utcnow())
+
     webauthn_data = Webauthn.query.filter_by(user_id=database_id).first()
+
     if not webauthn_data:
+
         webauthn_data = Webauthn(
             number=0, credentials="", is_enabled=False, user_id=database_id
         )
         db.session.add(webauthn_data)
         db.session.commit()
         webauthn_data = Webauthn.query.filter_by(user_id=database_id).first()
-    webauthn_data.credentials = get_credential_data_to_store(
-        user_credential_data
+
+    webauthn_data.credentials = encode_credentials_data_to_store(
+        credential_data
     )
     if webauthn_data.number <= 10:
         webauthn_data.number += 1
@@ -188,10 +236,7 @@ def authenticate_begin():
     user = User.query.filter_by(username=username).first()
     database_id = user.did
 
-    user_credential_data = get_user_credential_data(database_id)
-    credentials_blob = list(user_credential_data)
-    credentials = make_credentials_from_data(credentials_blob)
-
+    credentials = get_credentials(database_id)
     if not credentials:
         abort(401)
 
@@ -213,10 +258,7 @@ def authenticate_complete():
     user = User.query.filter_by(username=username).first()
     database_id = user.did
 
-    user_credential_data = get_user_credential_data(database_id)
-    credentials_blob = list(user_credential_data)
-    credentials = make_credentials_from_data(credentials_blob)
-
+    credentials = get_credentials(database_id)
     if not credentials:
         abort(401)
 
@@ -237,18 +279,22 @@ def authenticate_complete():
     )
 
     webauthn = Webauthn.query.filter_by(user_id=database_id).first()
-    for cred in credentials_blob:
-        if (
-            credential_id
-            == AttestationObject(cred).auth_data.credential_data.credential_id
-        ):
-            user_credential_data[cred] = str(datetime.utcnow())
-            webauthn.credentials = get_credential_data_to_store(
-                user_credential_data
-            )
-            db.session.add(webauthn)
-            db.session.commit()
+
+    for cred in credentials:
+        if cred.credential_id == credential_id:
+            cred_parameters = {
+                "aaguid": cred.aaguid,
+                "credential_id": cred.credential_id,
+                "public_key": cred.public_key,
+            }
+            encoded_key = cbor.encode(cred_parameters)
+            credential_data = get_credential_data(database_id)
+            credential_data[encoded_key] = str(datetime.utcnow())
             break
+
+    webauthn.credentials = encode_credentials_data_to_store(credential_data)
+    db.session.add(webauthn)
+    db.session.commit()
 
     login_user(user, remember=remember_me)
 
