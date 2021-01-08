@@ -7,7 +7,6 @@ click==7.1.2
 Flask_Migrate==2.5.3
 Flask_Bcrypt==0.7.1
 flask_talisman==0.7.0
--e git://github.com/maxcountryman/flask-login.git@c073d3bdeceb2a9c280c421f57c9770ffd9f183a#egg=Flask_Login
 Flask_WTF==0.14.3
 pyotp==2.3.0
 Werkzeug==1.0.1
@@ -15,3 +14,7 @@ Flask_Mail==0.9.1
 Flask_Babel==1.0.0
 WTForms==2.3.1
 PyJWT==1.7.1
+cryptography==3.3.1
+fido2==0.8.1
+soft-webauthn==0.1.2
+-e git://github.com/maxcountryman/flask-login.git#egg=Flask_Login
