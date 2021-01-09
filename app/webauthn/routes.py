@@ -28,6 +28,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import base64
+import os
 import uuid
 from datetime import datetime
 
@@ -119,6 +120,18 @@ def check():
     return render_template("webauthn/authenticate.html")
 
 
+@bp.route("/keys/add")
+@fresh_login_required
+def add_key():
+    return render_template("webauthn/register.html")
+
+
+@bp.route("/keys/manage")
+@fresh_login_required
+def manage_keys():
+    return "Your keys: TO-DO"
+
+
 @bp.route("/activate")
 @login_required
 @fresh_login_required
@@ -134,17 +147,9 @@ def activate():
         db.session.commit()
         flash(_("Enabled Webauthn!"))
         return render_template("index.html")
-
     else:
-        webauthn = Webauthn.query.filter_by(user_id=database_id).first()
         flash(_("You have to register the keys before"))
-        return render_template("webauthn/register.html")
-
-
-@bp.route("/management")
-@fresh_login_required
-def manage_keys():
-    return "Your keys: TO-DO"
+        return redirect(url_for("webauthn.add_key"))
 
 
 @bp.route("/register/begin", methods=["POST"])
@@ -154,14 +159,29 @@ def register_begin():
     user_database_id = User.get_database_id(user_id)
     user = User.query.filter_by(did=user_database_id).first()
     username = user.username
+    database_id = user.did
 
     credentials = get_credentials(user_database_id)
 
-    webauthn_user_id = uuid.uuid4().hex.encode()
+    webauthn_data = Webauthn.query.filter_by(user_id=database_id).first()
+
+    if not webauthn_data:
+        user_identifier = os.urandom(32)
+        webauthn_data = Webauthn(
+            number=0,
+            credentials="",
+            is_enabled=False,
+            user_identifier=base64.b64encode(user_identifier),
+            user_id=database_id,
+        )
+        db.session.add(webauthn_data)
+        db.session.commit()
+
+    user_identifier = webauthn_data.user_identifier
 
     registration_data, state = server.register_begin(
         {
-            "id": webauthn_user_id,
+            "id": user_identifier,
             "name": username,
             "displayName": f"OnyxcherryAuthn demo - {username}",
             "icon": "https://example.com/image.png",
@@ -197,18 +217,16 @@ def register_complete():
     }
 
     credential_data = get_credential_data(database_id)
-    credential_data[cbor.encode(creds_parameters)] = str(datetime.utcnow())
+
+    current_counter = int(att_obj.auth_data.counter)
+    data = {
+        "counter": current_counter,
+        "datetime": str(datetime.utcnow()),
+    }
+
+    credential_data[cbor.encode(creds_parameters)] = data
 
     webauthn_data = Webauthn.query.filter_by(user_id=database_id).first()
-
-    if not webauthn_data:
-
-        webauthn_data = Webauthn(
-            number=0, credentials="", is_enabled=False, user_id=database_id
-        )
-        db.session.add(webauthn_data)
-        db.session.commit()
-        webauthn_data = Webauthn.query.filter_by(user_id=database_id).first()
 
     webauthn_data.credentials = encode_credentials_data_to_store(
         credential_data
@@ -263,7 +281,6 @@ def authenticate_complete():
         abort(401)
 
     data = cbor.decode(request.get_data())
-
     credential_id = data["credentialId"]
     client_data = ClientData(data["clientDataJSON"])
     auth_data = AuthenticatorData(data["authenticatorData"])
@@ -280,6 +297,10 @@ def authenticate_complete():
 
     webauthn = Webauthn.query.filter_by(user_id=database_id).first()
 
+    current_counter = int(auth_data.counter)
+
+    credential_data = get_credential_data(database_id)
+
     for cred in credentials:
         if cred.credential_id == credential_id:
             cred_parameters = {
@@ -288,8 +309,20 @@ def authenticate_complete():
                 "public_key": cred.public_key,
             }
             encoded_key = cbor.encode(cred_parameters)
-            credential_data = get_credential_data(database_id)
-            credential_data[encoded_key] = str(datetime.utcnow())
+            last_counter = int(credential_data[encoded_key].get("counter"))
+
+            if last_counter is None or last_counter >= current_counter:
+                # Cloned => untrusted key!
+                return cbor.encode(
+                    {"status": "ERROR", "reason": "invalid counter"}
+                )
+
+            data = {
+                "counter": current_counter,
+                "datetime": str(datetime.utcnow()),
+            }
+
+            credential_data[encoded_key] = data
             break
 
     webauthn.credentials = encode_credentials_data_to_store(credential_data)

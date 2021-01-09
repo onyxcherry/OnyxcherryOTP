@@ -85,7 +85,7 @@ OnyxcherryOTP uses SendGrid to sending emails. Set `MAIL_LOCALHOST=True` in the 
 Type 
 
 ``` 
-python3 -m smtpd -n -c DebuggingServer localhost:8465`
+python3 -m smtpd -n -c DebuggingServer localhost:8465
 ```
 
 in another console window.

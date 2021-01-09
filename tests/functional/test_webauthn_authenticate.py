@@ -32,8 +32,12 @@ def test_webauthn_authenticate(test_client, init_database):
         "credential_id": registered_credential.credential_id,
         "public_key": registered_credential.public_key,
     }
-    credential_data = {}
-    credential_data[cbor.encode(creds_parameters)] = str(datetime.utcnow())
+
+    data = {
+        "counter": 0,
+        "datetime": str(datetime.utcnow()),
+    }
+    credential_data = {cbor.encode(creds_parameters): data}
     webauthn_for_user4.credentials = encode_credentials_data_to_store(
         credential_data
     )
