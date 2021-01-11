@@ -6,7 +6,6 @@ import pyotp
 import pytest
 from app import Config, create_app, db
 from app.models import User, Webauthn, generate_sid
-from app.webauthn.routes import encode_credentials_data_to_store
 from fido2.ctap2 import cbor
 from soft_webauthn import SoftWebauthnDevice
 
@@ -77,7 +76,7 @@ def init_database():
 
     got_user4 = User.query.filter_by(username="mark").first()
     webauthn_for_user4 = Webauthn(
-        number=0, credentials="", is_enabled=True, user_id=got_user4.did
+        number=0, is_enabled=True, user_id=got_user4.did
     )
 
     db.session.add(webauthn_for_user4)

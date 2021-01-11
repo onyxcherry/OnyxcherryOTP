@@ -28,15 +28,17 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import base64
+import hashlib
 import os
-import uuid
 from datetime import datetime
+from typing import Tuple
 
 from app import db
-from app.models import User, Webauthn
+from app.models import Key, User, Webauthn
 from app.webauthn import bp
 from config import Config
 from fido2 import cbor
+from fido2.attestation import Attestation
 from fido2.client import ClientData
 from fido2.ctap2 import (
     AttestationObject,
@@ -66,47 +68,30 @@ from werkzeug.urls import url_parse
 
 rp = PublicKeyCredentialRpEntity(Config.RP_ID, "Demo server")
 server = Fido2Server(rp)
-
-
-def get_next_page(next_from_request: str) -> str:
-    next_page = next_from_request
-    if not next_page or url_parse(next_page).netloc != "":
-        next_page = url_for("main.index")
-    return next_page
-
-
-def get_credential_data(user_database_id: int) -> dict:
-    webauthn = Webauthn.query.filter_by(user_id=user_database_id).first()
-    if webauthn and webauthn.credentials:
-        credential_blob = webauthn.credentials
-        credential_data = cbor.decode(base64.b64decode(credential_blob))
-    else:
-        credential_data = {}
-    return credential_data
+server = Fido2Server(rp, attestation=Config.ATTESTATION)
 
 
 def get_credentials(user_database_id: int) -> list:
-    credential_data = get_credential_data(user_database_id)
-    encoded_keys = list(credential_data)
-    if not encoded_keys:
-        return []
-    decoded_keys = [cbor.decode(k) for k in encoded_keys]
-    credentials = make_credentials_from_data_second(decoded_keys)
-    return credentials
-
-
-def encode_credentials_data_to_store(credential_data: dict) -> str:
-    return base64.b64encode(cbor.encode(credential_data))
-
-
-def make_credentials_from_data_second(data: list) -> list:
+    current_keys = Key.query.filter_by(user_id=user_database_id).all()
     credentials = []
-    for d in data:
+    for key in current_keys:
         obj = AttestedCredentialData.create(
-            d["aaguid"], d["credential_id"], d["public_key"],
+            key.aaguid, key.credential_id, cbor.decode(key.public_key)
         )
         credentials.append(obj)
     return credentials
+
+
+def get_current_user_info(token: str, user_identity: str) -> Tuple[int, bool]:
+    if user_identity is not None:
+        database_id = User.get_database_id(user_identity)
+        return (database_id, False)
+
+    if token is not None:
+        username, remember_me = User.verify_twofa_login_token(token.encode())
+        user = User.query.filter_by(username=username).first()
+        database_id = user.did
+        return (database_id, remember_me)
 
 
 @bp.route("/")
@@ -117,7 +102,7 @@ def index():
 @bp.route("/check")
 @fresh_login_required
 def check():
-    return render_template("webauthn/authenticate.html")
+    return render_template("webauthn/login_with_webauthn.html")
 
 
 @bp.route("/keys/add")
@@ -132,6 +117,26 @@ def manage_keys():
     return "Your keys: TO-DO"
 
 
+@bp.route("/verify_attestation")
+def verify_attestation():
+    user_id = current_user.get_id()
+    user_database_id = User.get_database_id(user_id)
+
+    status = []
+    keys = Key.query.filter_by(user_id=user_database_id).all()
+    for key in keys:
+        decoded_attestation = cbor.decode(key.attestation)
+        statement = decoded_attestation["attStmt"]
+        auth_data = AuthenticatorData(decoded_attestation["authData"])
+        client_data_hash = key.client_data_hash
+        fmt = decoded_attestation["fmt"]
+        obtain_att = Attestation.for_type(fmt)
+        att = obtain_att()
+        verification = att.verify(statement, auth_data, client_data_hash)
+        status.append("OK")
+    return str(status)
+
+
 @bp.route("/activate")
 @login_required
 @fresh_login_required
@@ -141,7 +146,7 @@ def activate():
     webauthn = Webauthn.query.filter_by(user_id=database_id).first()
 
     # alternatively we should allow in case when one key added and backup codes
-    if webauthn and webauthn.credentials and webauthn.number >= 2:
+    if webauthn and webauthn.number >= 2:
         webauthn.is_enabled = True
         db.session.add(webauthn)
         db.session.commit()
@@ -165,11 +170,10 @@ def register_begin():
 
     webauthn_data = Webauthn.query.filter_by(user_id=database_id).first()
 
-    if not webauthn_data:
-        user_identifier = os.urandom(32)
+    if webauthn_data is None:
+        user_identifier = b"\x7e" + os.urandom(31)
         webauthn_data = Webauthn(
             number=0,
-            credentials="",
             is_enabled=False,
             user_identifier=base64.b64encode(user_identifier),
             user_id=database_id,
@@ -187,6 +191,7 @@ def register_begin():
             "icon": "https://example.com/image.png",
         },
         credentials,
+        # resident_key=True,
         user_verification="discouraged",
         authenticator_attachment="cross-platform",
     )
@@ -210,30 +215,26 @@ def register_complete():
         session["state"], client_data, att_obj
     )
 
-    creds_parameters = {
-        "aaguid": auth_data.credential_data.aaguid,
-        "credential_id": auth_data.credential_data.credential_id,
-        "public_key": auth_data.credential_data.public_key,
-    }
-
-    credential_data = get_credential_data(database_id)
-
-    current_counter = int(att_obj.auth_data.counter)
-    data = {
-        "counter": current_counter,
-        "datetime": str(datetime.utcnow()),
-    }
-
-    credential_data[cbor.encode(creds_parameters)] = data
+    new_key = Key(
+        name="TODO",
+        aaguid=auth_data.credential_data.aaguid,
+        credential_id=auth_data.credential_data.credential_id,
+        client_data_hash=hashlib.sha256(client_data).digest(),
+        public_key=cbor.encode(auth_data.credential_data.public_key),
+        counter=att_obj.auth_data.counter,
+        attestation=data["attestationObject"],
+        info="TODO",
+        last_access=datetime.utcnow(),
+        created=datetime.utcnow(),
+        user_id=database_id,
+    )
 
     webauthn_data = Webauthn.query.filter_by(user_id=database_id).first()
 
-    webauthn_data.credentials = encode_credentials_data_to_store(
-        credential_data
-    )
     if webauthn_data.number <= 10:
         webauthn_data.number += 1
         db.session.add(webauthn_data)
+        db.session.add(new_key)
         db.session.commit()
         return cbor.encode({"status": "OK"})
     else:
@@ -245,14 +246,11 @@ def register_complete():
 @bp.route("/authenticate/begin", methods=["POST"])
 def authenticate_begin():
     token = request.cookies.get("token")
-    if not token:
+    user_identity = current_user.get_id()
+    database_id, _ = get_current_user_info(token, user_identity)
+
+    if database_id is None:
         abort(401)
-    username, remember_me = User.verify_twofa_login_token(token.encode())
-    if not username:
-        flash(_("Invalid token!"))
-        return redirect(url_for("auth.login"))
-    user = User.query.filter_by(username=username).first()
-    database_id = user.did
 
     credentials = get_credentials(database_id)
     if not credentials:
@@ -267,14 +265,12 @@ def authenticate_begin():
 @bp.route("/authenticate/complete", methods=["POST"])
 def authenticate_complete():
     token = request.cookies.get("token")
-    if not token:
+    user_identity = current_user.get_id()
+    database_id, remember_me = get_current_user_info(token, user_identity)
+    if database_id is None:
         abort(401)
-    username, remember_me = User.verify_twofa_login_token(token.encode())
-    if not username:
-        flash(_("Invalid token!"))
-        return redirect(url_for("auth.login"))
-    user = User.query.filter_by(username=username).first()
-    database_id = user.did
+
+    user = User.query.filter_by(did=database_id).first()
 
     credentials = get_credentials(database_id)
     if not credentials:
@@ -299,34 +295,20 @@ def authenticate_complete():
 
     current_counter = int(auth_data.counter)
 
-    credential_data = get_credential_data(database_id)
+    keys = Key.query.filter_by(user_id=database_id).all()
 
-    for cred in credentials:
-        if cred.credential_id == credential_id:
-            cred_parameters = {
-                "aaguid": cred.aaguid,
-                "credential_id": cred.credential_id,
-                "public_key": cred.public_key,
-            }
-            encoded_key = cbor.encode(cred_parameters)
-            last_counter = int(credential_data[encoded_key].get("counter"))
-
+    for key in keys:
+        if key.credential_id == credential_id:
+            last_counter = key.counter
             if last_counter is None or last_counter >= current_counter:
                 # Cloned => untrusted key!
                 return cbor.encode(
-                    {"status": "ERROR", "reason": "invalid counter"}
+                    {"status": "error", "reason": "invalid counter"}
                 )
-
-            data = {
-                "counter": current_counter,
-                "datetime": str(datetime.utcnow()),
-            }
-
-            credential_data[encoded_key] = data
+            key.last_access = datetime.utcnow()
+            key.counter = current_counter
             break
-
-    webauthn.credentials = encode_credentials_data_to_store(credential_data)
-    db.session.add(webauthn)
+    db.session.add(key)
     db.session.commit()
 
     login_user(user, remember=remember_me)

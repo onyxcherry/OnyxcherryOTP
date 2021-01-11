@@ -31,6 +31,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     otp = db.relationship("OTP", backref="user", uselist=False)
     webauthn = db.relationship("Webauthn", backref="user", uselist=False)
+    key = db.relationship("Key", backref="user")
     reset_password_value = db.relationship(
         "ResetPassword", backref="user", uselist=False
     )
@@ -162,9 +163,7 @@ class OTP(db.Model):
     __tablename__ = "otp"
     id = db.Column(db.Integer, primary_key=True)
     secret = db.Column(db.String(32))
-    is_valid = db.Column(
-        db.Boolean, default=False
-    )  # change to db.Boolean if database supports booleans
+    is_valid = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.did"))
     remaining_attempts = db.Column(db.Integer)
 
@@ -189,7 +188,6 @@ class Webauthn(db.Model):
     __tablename__ = "webauthn"
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.Integer, default=0)
-    credentials = db.Column(db.String(10000))
     is_enabled = db.Column(db.Boolean, default=False)
     user_identifier = db.Column(db.String(86))
     user_id = db.Column(db.Integer, db.ForeignKey("user.did"))
@@ -198,9 +196,28 @@ class Webauthn(db.Model):
         return f"<Webauthn - {self.number} keys for user {self.user_id}>"
 
 
+class Key(db.Model):
+    __tablename__ = "keys"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    aaguid = db.Column(db.LargeBinary(16))
+    credential_id = db.Column(db.LargeBinary(64))
+    client_data_hash = db.Column(db.LargeBinary(32))
+    public_key = db.Column(db.LargeBinary(77))
+    counter = db.Column(db.Integer, default=0)
+    attestation = db.Column(db.LargeBinary(1021))
+    info = db.Column(db.String(1000))
+    is_resident = db.Column(db.Boolean(), default=False)
+    last_access = db.Column(db.DateTime)
+    created = db.Column(db.DateTime)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.did"))
+
+    def __repr__(self):
+        return f"<Key - {self.name}>"
+
+
 @login.user_loader
 def load_user(user_id):
-    # return User.query.get(int(id))
     assert isinstance(user_id, str)
     did = User.get_database_id(user_id)
     sid = User.get_session_id(user_id)

@@ -106,6 +106,8 @@ class Config(object):
 
     PREFERRED_URL_SCHEME = "https"
 
+    ATTESTATION = os.environ.get("ATTESTATION") or "direct"
+
     # Very useful when debugging especially templates. Change to True if needed
     EXPLAIN_TEMPLATE_LOADING = False
 

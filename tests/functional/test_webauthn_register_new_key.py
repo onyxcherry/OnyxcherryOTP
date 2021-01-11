@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from app.models import User, Webauthn
+from app.models import Key, User, Webauthn
 from conftest import TestConfig
 from fido2 import cbor
 from helping import sign_in
@@ -33,6 +33,5 @@ def test_webauthn_register_new_key(test_client, init_database):
     webauthn = Webauthn.query.filter_by(user_id=user.did).first()
 
     assert webauthn
-    assert webauthn.credentials is not None
     assert webauthn.number == 1
     assert webauthn.is_enabled is False

@@ -4,11 +4,8 @@ from io import BytesIO
 from unittest.mock import patch
 
 import app.webauthn.routes
-from app.models import User, Webauthn
-from app.webauthn.routes import (
-    encode_credentials_data_to_store,
-    get_credentials,
-)
+from app.models import Key, User, Webauthn
+from app.webauthn.routes import get_credentials
 from conftest import TestConfig
 from fido2 import cbor
 from helping import sign_in
@@ -27,21 +24,20 @@ def test_webauthn_authenticate(test_client, init_database):
     user4 = User.query.filter_by(username="mark").first()
     webauthn_for_user4 = Webauthn.query.filter_by(user_id=user4.did).first()
 
-    creds_parameters = {
-        "aaguid": registered_credential.aaguid,
-        "credential_id": registered_credential.credential_id,
-        "public_key": registered_credential.public_key,
-    }
-
-    data = {
-        "counter": 0,
-        "datetime": str(datetime.utcnow()),
-    }
-    credential_data = {cbor.encode(creds_parameters): data}
-    webauthn_for_user4.credentials = encode_credentials_data_to_store(
-        credential_data
+    key_created_date = datetime.utcnow()
+    key_last_access = datetime.utcnow()
+    already_registered_key = Key(
+        name="mykey1",
+        aaguid=registered_credential.aaguid,
+        credential_id=registered_credential.credential_id,
+        public_key=cbor.encode(registered_credential.public_key),
+        counter=0,
+        last_access=key_last_access,
+        created=key_created_date,
+        user_id=user4.did,
     )
-    init_database.session.add(webauthn_for_user4)
+
+    init_database.session.add(already_registered_key)
     init_database.session.commit()
 
     pkcro = cbor.decode(test_client.post("/webauthn/authenticate/begin").data)
