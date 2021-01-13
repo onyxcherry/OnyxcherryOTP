@@ -28,14 +28,16 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import base64
+import binascii
 import hashlib
 import os
 from datetime import datetime
 from typing import Tuple
 
-from app import db
+from app import csrf, db
 from app.models import Key, User, Webauthn
 from app.webauthn import bp
+from app.webauthn.forms import NameKey
 from config import Config
 from fido2 import cbor
 from fido2.attestation import Attestation
@@ -67,7 +69,6 @@ from flask_login import (
 from werkzeug.urls import url_parse
 
 rp = PublicKeyCredentialRpEntity(Config.RP_ID, "Demo server")
-server = Fido2Server(rp)
 server = Fido2Server(rp, attestation=Config.ATTESTATION)
 
 
@@ -118,6 +119,7 @@ def manage_keys():
 
 
 @bp.route("/verify_attestation")
+@login_required
 def verify_attestation():
     user_id = current_user.get_id()
     user_database_id = User.get_database_id(user_id)
@@ -135,6 +137,39 @@ def verify_attestation():
         verification = att.verify(statement, auth_data, client_data_hash)
         status.append("OK")
     return str(status)
+
+
+@bp.route("/keys/name/<credential_id>")
+@fresh_login_required
+def render_key_name(credential_id):
+    form = NameKey()
+    return render_template(
+        "webauthn/name_key.html", form=form, credential_id=credential_id
+    )
+
+
+@bp.route("/keys/name", methods=["POST"])
+@fresh_login_required
+def name_key():
+    user_id = current_user.get_id()
+    database_id = User.get_database_id(user_id)
+    form = NameKey()
+    if form.validate_on_submit():
+        credential_id = form.credential_id.data
+        new_key_name = form.key_name.data
+        webauthn_key = (
+            Key.query.filter_by(user_id=database_id)
+            .filter_by(credential_id=binascii.a2b_hex(credential_id))
+            .first()
+        )
+        if webauthn_key is None:
+            abort(401)
+        webauthn_key.name = new_key_name
+        db.session.add(webauthn_key)
+        db.session.commit()
+        flash(_("Correctly!"))
+        return redirect(url_for("webauthn.index"))
+    abort(401)
 
 
 @bp.route("/activate")
@@ -238,8 +273,12 @@ def register_complete():
         db.session.commit()
         return cbor.encode({"status": "OK"})
     else:
-        return cbor.encode(
-            {"status": "error", "reason": "Too much keys registered"}
+        flash(_("Too much keys registered"))
+        return (
+            cbor.encode(
+                {"status": "error", "reason": "Too much keys registered"}
+            ),
+            401,
         )
 
 

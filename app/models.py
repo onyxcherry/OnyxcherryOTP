@@ -1,3 +1,4 @@
+import binascii
 import os
 from base64 import b64encode
 from datetime import datetime, timedelta
@@ -213,7 +214,8 @@ class Key(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.did"))
 
     def __repr__(self):
-        return f"<Key - {self.name}>"
+        short_hex_cred_id = binascii.b2a_hex(self.credential_id)[:6].decode()
+        return f"<Key - {self.name} for {short_hex_cred_id}>"
 
 
 @login.user_loader
