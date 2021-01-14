@@ -204,8 +204,23 @@ def name_key():
 @fresh_login_required
 def render_key_delete(credential_id):
     form = DeleteKey()
+    user_id = current_user.get_id()
+    user_database_id = User.get_database_id(user_id)
+    webauth = Webauthn.query.filter_by(user_id=user_database_id).first()
+    if webauth.number == 1:
+        flash(
+            _(
+                "Deleting the key causes deactivating Webauthn"
+                "for your account!"
+            )
+        )
+    short_credential_id = credential_id[:12]
+
     return render_template(
-        "webauthn/delete_key.html", form=form, credential_id=credential_id
+        "webauthn/delete_key.html",
+        form=form,
+        credential_id=credential_id,
+        short_credential_id=short_credential_id,
     )
 
 
@@ -225,6 +240,9 @@ def delete_key():
         if key_to_delete is None:
             abort(401)
         db.session.delete(key_to_delete)
+        webautn = Webauthn.query.filter_by(user_id=user_database_id).first()
+        webautn.number -= 1
+        db.session.delete(webautn)
         db.session.commit()
         flash(_("Deleted!"))
         return redirect(url_for("webauthn.index"))
