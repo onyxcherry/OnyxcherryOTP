@@ -1,0 +1,11 @@
+{% extends 'form_page.html' %}
+
+{% block forms %}
+<h1>{{ _('Delete key with credential id ') }}{{ credential_id }} ?</h1>
+
+<form action="{{ url_for('webauthn.delete_key') }}" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    {{ form.credential_id(value=credential_id) }}
+    {{ form.submit(class="btn btn-block login-btn mb-4") }}
+</form>
+{% endblock %}

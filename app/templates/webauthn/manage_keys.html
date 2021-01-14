@@ -1,0 +1,8 @@
+{% extends "index.html" %}
+
+{% block content %}
+<h1>{{ _('Your keys:') }}</h1>
+<div id="user-keys"></div>
+
+<script src='/static/js/parse_keys_list.js' nonce="{{ csp_nonce() }}" async defer></script>
+{% endblock %}

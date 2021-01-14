@@ -37,10 +37,10 @@ from typing import Tuple
 from app import csrf, db
 from app.models import Key, User, Webauthn
 from app.webauthn import bp
-from app.webauthn.forms import NameKey
+from app.webauthn.forms import DeleteKey, NameKey
 from config import Config
 from fido2 import cbor
-from fido2.attestation import Attestation
+from fido2.attestation import Attestation, InvalidSignature
 from fido2.client import ClientData
 from fido2.ctap2 import (
     AttestationObject,
@@ -52,6 +52,7 @@ from fido2.webauthn import PublicKeyCredentialRpEntity
 from flask import (
     abort,
     flash,
+    jsonify,
     redirect,
     render_template,
     request,
@@ -96,8 +97,19 @@ def get_current_user_info(token: str, user_identity: str) -> Tuple[int, bool]:
 
 
 @bp.route("/")
+@login_required
 def index():
-    return render_template("webauthn/overview.html", webauthn_enabled=False)
+    user_id = current_user.get_id()
+    user_database_id = User.get_database_id(user_id)
+    webauthn = Webauthn.query.filter_by(user_id=user_database_id).first()
+    if webauthn is not None:
+        webauthn_is_enabled = webauthn.is_enabled
+    else:
+        webauthn_is_enabled = False
+
+    return render_template(
+        "webauthn/overview.html", webauthn_enabled=webauthn_is_enabled
+    )
 
 
 @bp.route("/check")
@@ -115,7 +127,20 @@ def add_key():
 @bp.route("/keys/manage")
 @fresh_login_required
 def manage_keys():
-    return "Your keys: TO-DO"
+    return render_template("webauthn/manage_keys.html")
+
+
+@bp.route("/keys/list")
+@login_required
+def list_keys():
+    user_id = current_user.get_id()
+    user_database_id = User.get_database_id(user_id)
+    keys = Key.query.filter_by(user_id=user_database_id).all()
+    resp = {}
+    for key in keys:
+        o = {"name": key.name, "last_access": key.last_access}
+        resp[binascii.b2a_hex(key.credential_id).decode()] = o
+    return jsonify(resp)
 
 
 @bp.route("/verify_attestation")
@@ -123,8 +148,7 @@ def manage_keys():
 def verify_attestation():
     user_id = current_user.get_id()
     user_database_id = User.get_database_id(user_id)
-
-    status = []
+    resp = {}
     keys = Key.query.filter_by(user_id=user_database_id).all()
     for key in keys:
         decoded_attestation = cbor.decode(key.attestation)
@@ -134,9 +158,13 @@ def verify_attestation():
         fmt = decoded_attestation["fmt"]
         obtain_att = Attestation.for_type(fmt)
         att = obtain_att()
-        verification = att.verify(statement, auth_data, client_data_hash)
-        status.append("OK")
-    return str(status)
+        try:
+            verification = att.verify(statement, auth_data, client_data_hash)
+        except InvalidSignature:
+            resp[binascii.b2a_hex(key.credential_id).decode()] = "ERROR"
+        finally:
+            resp[binascii.b2a_hex(key.credential_id).decode()] = "OK"
+    return jsonify(resp)
 
 
 @bp.route("/keys/name/<credential_id>")
@@ -172,8 +200,38 @@ def name_key():
     abort(401)
 
 
+@bp.route("/keys/delete/<credential_id>")
+@fresh_login_required
+def render_key_delete(credential_id):
+    form = DeleteKey()
+    return render_template(
+        "webauthn/delete_key.html", form=form, credential_id=credential_id
+    )
+
+
+@bp.route("/keys/delete", methods=["POST"])
+@fresh_login_required
+def delete_key():
+    user_id = current_user.get_id()
+    user_database_id = User.get_database_id(user_id)
+    form = DeleteKey()
+    if form.validate_on_submit():
+        credential_id = form.credential_id.data
+        key_to_delete = (
+            Key.query.filter_by(user_id=user_database_id)
+            .filter_by(credential_id=binascii.a2b_hex(credential_id))
+            .first()
+        )
+        if key_to_delete is None:
+            abort(401)
+        db.session.delete(key_to_delete)
+        db.session.commit()
+        flash(_("Deleted!"))
+        return redirect(url_for("webauthn.index"))
+    abort(401)
+
+
 @bp.route("/activate")
-@login_required
 @fresh_login_required
 def activate():
     user_id = current_user.get_id()
@@ -188,8 +246,23 @@ def activate():
         flash(_("Enabled Webauthn!"))
         return render_template("index.html")
     else:
-        flash(_("You have to register the keys before"))
+        flash(_("You have to register keys before"))
         return redirect(url_for("webauthn.add_key"))
+
+
+@bp.route("/deactivate")
+@fresh_login_required
+def deactivate():
+    user_id = current_user.get_id()
+    database_id = User.get_database_id(user_id)
+    webauthn = Webauthn.query.filter_by(user_id=database_id).first()
+
+    if webauthn is not None and webauthn.is_enabled is True:
+        webauthn.is_enabled = False
+        db.session.add(webauthn)
+        db.session.commit()
+        flash(_("Deactivated webauthn!"))
+    return redirect(url_for("webauthn.index"))
 
 
 @bp.route("/register/begin", methods=["POST"])

@@ -10,3 +10,8 @@ class NameKey(FlaskForm):
         _l("Name: "), validators=[DataRequired(), Length(max=64)]
     )
     submit = SubmitField(_l("Submit"))
+
+
+class DeleteKey(FlaskForm):
+    credential_id = HiddenField()
+    submit = SubmitField(_l("Submit"))
