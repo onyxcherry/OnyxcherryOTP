@@ -127,7 +127,13 @@ def add_key():
 @bp.route("/keys/manage")
 @fresh_login_required
 def manage_keys():
-    return render_template("webauthn/manage_keys.html")
+    user_id = current_user.get_id()
+    user_database_id = User.get_database_id(user_id)
+    webauth = Webauthn.query.filter_by(user_id=user_database_id).first()
+    any_keys = False
+    if webauth is not None and webauth.number > 0:
+        any_keys = True
+    return render_template("webauthn/manage_keys.html", any_keys=any_keys)
 
 
 @bp.route("/keys/list")

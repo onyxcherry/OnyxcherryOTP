@@ -1,11 +1,21 @@
 // sample:
 // const data = { "420048e3a0d1c0a1170e53e1ed6a3f59c462a9c7ed86f80a669a663671b7e187d3f9312148abdcd951cf1cd1595b4bedd37e789be792fa49c1c3fa5d56e827df": { "last_access": "Mon, 11 Jan 2021 16:00:34 GMT", "name": "MyBlueKey" } }
 
+function check_if_any_keys() {
+    const container = document.getElementById('user-keys')
+    if (container !== null) {
+        return true
+    }
+    return false
+}
 async function get_keys_list() {
     return fetch('/webauthn/keys/list').then(response => response.json())
 }
 
 async function build_table() {
+    if (!check_if_any_keys()) {
+        return
+    }
     const data = await get_keys_list()
 
     const container = document.getElementById('user-keys')
