@@ -104,3 +104,5 @@ in another console window.
 * [QR Code svg generator](https://github.com/datalog/qrcode-svg) – client-side, pure Javascript
 * [Bootstrap pretty forms](https://www.bootstrapdash.com/product/free-bootstrap-login/)
 * [Bootstrap Cover theme](https://getbootstrap.com/docs/4.5/examples/cover/)
+* [Webauthn developer guide](https://developers.yubico.com/WebAuthn/)
+* [Webauthn logo](https://github.com/samuelweiler/webauthn-logos)

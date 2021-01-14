@@ -10,8 +10,13 @@
 <a href="{{ url_for('twofa.activate') }}" class="btn btn-primary">{{ _('Turn on 2FA') }}</a>
 {% endif %}
 <p></p>
+<img id="webauthn-image" src="/static/images/final-webauthn-logo-webauthn-white.png">
+<p></p>
+<a href="{{ url_for('webauthn.index') }}" class="btn btn-success">{{ _('Webauthn') }}</a>
+
+<p></p>
 <img id="revoke-image" src="/static/images/revoke.png">
 <p></p>
-<p class="lead"><a href="{{ url_for('auth.revoke_other_sessions') }}"
-        class="btn btn-danger">{{ _('Revoke other sessions') }}</a></p>
+<p class="lead"><a href="{{ url_for('auth.revoke_other_sessions') }}" class="btn btn-danger">{{ _('Revoke other
+                sessions') }}</a></p>
 {% endblock %}
