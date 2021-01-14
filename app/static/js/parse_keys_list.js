@@ -24,6 +24,10 @@ async function build_table() {
     const last_access_header = document.createElement('th')
     last_access_header.innerText = "Last access"
     header.append(last_access_header)
+    const action_header = document.createElement('th')
+    action_header.innerText = "Action"
+    header.append(action_header)
+
     table.append(header)
 
     keys = Object.keys(data)
@@ -40,9 +44,40 @@ async function build_table() {
         const last_access = document.createElement('td')
         last_access.innerText = new Date(data[key]['last_access']).toLocaleString()
         row.append(last_access)
+        const possible_action = document.createElement('td')
+        const action_button = create_action_button(key)
+        possible_action.append(action_button)
+        row.append(possible_action)
+
         table.append(row)
     }
 
     container.appendChild(table)
 }
+
+function create_action_button(cred_id) {
+    const h_container = document.createElement('div')
+    h_container.setAttribute('class', 'btn-group')
+
+    h_container.innerHTML = `<button class="btn btn-warning btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action</button>`
+
+    const s_container = document.createElement('div')
+    s_container.setAttribute('class', 'dropdown-menu')
+    s_container.style.minWidth = '5rem'
+
+    const rename_bt = document.createElement('a')
+    rename_bt.innerText = 'rename'
+    rename_bt.setAttribute('class', 'dropdown-item')
+    rename_bt.setAttribute('href', `/webauthn/keys/name/${cred_id}`)
+
+    const delete_bt = document.createElement('a')
+    delete_bt.innerText = 'delete'
+    delete_bt.setAttribute('class', 'dropdown-item')
+    delete_bt.setAttribute('href', `/webauthn/keys/delete/${cred_id}`)
+    s_container.appendChild(rename_bt)
+    s_container.appendChild(delete_bt)
+    h_container.appendChild(s_container)
+    return h_container
+}
+
 build_table()

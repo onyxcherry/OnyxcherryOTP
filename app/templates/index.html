@@ -11,7 +11,8 @@
 
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-    integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous" nonce="{{ csp_nonce() }}">
+    integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous"
+    nonce="{{ csp_nonce() }}">
 
   <link href="/static/css/cover.css" rel="stylesheet" nonce="{{ csp_nonce() }}">
 </head>
@@ -22,10 +23,10 @@
       <div class="inner">
         <h3 class="masthead-brand">OnyxcherryOTP</h3>
         <nav class="nav nav-masthead justify-content-center">
-          <a class="nav-link {% if not settings_active %}active{% endif %}"
-            href="{{ url_for('main.index') }}">{{ _('Home') }}</a>
-          <a class="nav-link {% if settings_active %}active{% endif %}"
-            href="{{ url_for('main.settings') }}">{{ _('Settings') }}</a>
+          <a class="nav-link {% if not settings_active %}active{% endif %}" href="{{ url_for('main.index') }}">{{
+            _('Home') }}</a>
+          <a class="nav-link {% if settings_active %}active{% endif %}" href="{{ url_for('main.settings') }}">{{
+            _('Settings') }}</a>
           {% if current_user.is_anonymous %}
           <a class="nav-link" href="{{ url_for('auth.login') }}">{{ _('Sign in') }}</a>
           {% else %}
@@ -46,11 +47,13 @@
       {% if default_content %}
 
       <h1 class="cover-heading">{{ _('Hello') }}, {{ current_user.username }}</h1>
-      <p class="lead">{{ _('This is my implementation of two-factor authentication app in Flask with required fresh login,
+      <p class="lead">{{ _('This is my implementation of two-factor authentication app in Flask with required fresh
+        login,
         revoking other sessions and translations handled by Flask-Babel.') }}</p>
       <p class="lead">{{ _('Get more informations below:') }}</p>
       <p class="lead">
-        <a href="https://github.com/onyxcherry/OnyxcherryOTP" class="btn btn-lg btn-secondary">{{ _('Check source') }}</a>
+        <a href="https://github.com/onyxcherry/OnyxcherryOTP" class="btn btn-lg btn-secondary">{{ _('Check source')
+          }}</a>
       </p>
       {% else %}
       {% block content %}
@@ -66,6 +69,13 @@
       </div>
     </footer>
   </div>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous" nonce="{{ csp_nonce() }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+    integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"
+    nonce="{{ csp_nonce() }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js"
+    integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"
+    nonce="{{ csp_nonce() }}"></script>
 </body>
 
 </html>
