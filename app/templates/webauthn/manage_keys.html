@@ -9,5 +9,6 @@
 <a href="{{ url_for('webauthn.add_key') }}" class="btn btn-success">{{ _('I would like to add one') }}</a>
 {% endif %}
 
-<script src='/static/js/parse_keys_list.js' nonce="{{ csp_nonce() }}" async defer></script>
+
+<script src='/static/js/manage_keys.js' nonce="{{ csp_nonce() }}" async defer></script>
 {% endblock %}

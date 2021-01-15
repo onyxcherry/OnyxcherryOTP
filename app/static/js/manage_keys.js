@@ -37,6 +37,9 @@ async function build_table() {
     const action_header = document.createElement('th')
     action_header.innerText = "Action"
     header.append(action_header)
+    const status_header = document.createElement('th')
+    status_header.innerText = "Status"
+    header.append(status_header)
 
     table.append(header)
 
@@ -58,6 +61,8 @@ async function build_table() {
         const action_button = create_action_button(key)
         possible_action.append(action_button)
         row.append(possible_action)
+        const checking_status = document.createElement('td')
+        row.append(checking_status)
 
         table.append(row)
     }
@@ -69,7 +74,7 @@ function create_action_button(cred_id) {
     const h_container = document.createElement('div')
     h_container.setAttribute('class', 'btn-group')
 
-    h_container.innerHTML = `<button class="btn btn-warning btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action</button>`
+    h_container.innerHTML = `<button class="btn btn-warning btn-sm dropdown-toggle dropdown-toggle-split" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action</button>`
 
     const s_container = document.createElement('div')
     s_container.setAttribute('class', 'dropdown-menu')
@@ -80,14 +85,70 @@ function create_action_button(cred_id) {
     rename_bt.setAttribute('class', 'dropdown-item')
     rename_bt.setAttribute('href', `/webauthn/keys/name/${cred_id}`)
 
+    const divider = document.createElement('div')
+    divider.setAttribute('class', 'dropdown-divider')
+
     const delete_bt = document.createElement('a')
     delete_bt.innerText = 'delete'
     delete_bt.setAttribute('class', 'dropdown-item')
     delete_bt.setAttribute('href', `/webauthn/keys/delete/${cred_id}`)
+
+    const att_check = document.createElement('a')
+    att_check.innerText = 'check attestation'
+    att_check.setAttribute('class', 'dropdown-item')
+    att_check.style.whiteSpace = 'pre-wrap'
+    att_check.addEventListener('click', (e) => update_status(e.target, cred_id))
+
     s_container.appendChild(rename_bt)
     s_container.appendChild(delete_bt)
+    s_container.appendChild(divider)
+    s_container.appendChild(att_check)
+
     h_container.appendChild(s_container)
+
     return h_container
 }
+function add_waiting_status(elem) {
+    const status = document.createElement('img')
+    status.setAttribute('src', '/static/images/spinning_fan.svg')
+    status.setAttribute('id', 'att-waiting-resp')
+    const row = elem.closest('tr')
+    const dest = row.lastChild
+    dest.appendChild(status)
+}
 
+async function update_status(elem, cred_id) {
+    const row = elem.closest('tr')
+    const dest = row.lastChild
+    if (dest.firstChild !== null) {
+        return
+    }
+    add_waiting_status(elem)
+
+    const resp = await get_att_data(cred_id)
+
+    if (resp.ok) {
+        const row = elem.closest('tr')
+        const waiting_status = document.getElementById('att-waiting-resp')
+        row.lastChild.removeChild(waiting_status)
+        const data = await resp.json()
+        const final_att_status = document.createElement('div')
+        if (data['status'] === "OK") {
+            final_att_status.innerText = "✓"
+            final_att_status.style.color = "green"
+            final_att_status.style.fontSize = '2rem'
+        }
+        else {
+            final_att_status.innerText = "⤬"
+            final_att_status.style.transform = "rotate(90deg)"
+            final_att_status.style.color = "red"
+            final_att_status.style.fontSize = '2rem'
+        }
+        row.lastChild.appendChild(final_att_status)
+    }
+}
+
+async function get_att_data(credential_id) {
+    return fetch(`/webauthn/verify_attestation/${credential_id}`)
+}
 build_table()

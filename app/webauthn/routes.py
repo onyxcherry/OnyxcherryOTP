@@ -149,27 +149,31 @@ def list_keys():
     return jsonify(resp)
 
 
-@bp.route("/verify_attestation")
+@bp.route("/verify_attestation/<credential_id>")
 @login_required
-def verify_attestation():
+def verify_attestation(credential_id):
     user_id = current_user.get_id()
     user_database_id = User.get_database_id(user_id)
     resp = {}
-    keys = Key.query.filter_by(user_id=user_database_id).all()
-    for key in keys:
-        decoded_attestation = cbor.decode(key.attestation)
-        statement = decoded_attestation["attStmt"]
-        auth_data = AuthenticatorData(decoded_attestation["authData"])
-        client_data_hash = key.client_data_hash
-        fmt = decoded_attestation["fmt"]
-        obtain_att = Attestation.for_type(fmt)
-        att = obtain_att()
-        try:
-            verification = att.verify(statement, auth_data, client_data_hash)
-        except InvalidSignature:
-            resp[binascii.b2a_hex(key.credential_id).decode()] = "ERROR"
-        finally:
-            resp[binascii.b2a_hex(key.credential_id).decode()] = "OK"
+    binary_credential_id = binascii.a2b_hex(credential_id)
+    key = (
+        Key.query.filter_by(user_id=user_database_id)
+        .filter_by(credential_id=binary_credential_id)
+        .first()
+    )
+    decoded_attestation = cbor.decode(key.attestation)
+    statement = decoded_attestation["attStmt"]
+    auth_data = AuthenticatorData(decoded_attestation["authData"])
+    client_data_hash = key.client_data_hash
+    fmt = decoded_attestation["fmt"]
+    obtain_att = Attestation.for_type(fmt)
+    att = obtain_att()
+    try:
+        verification = att.verify(statement, auth_data, client_data_hash)
+    except InvalidSignature:
+        resp["status"] = "error"
+    finally:
+        resp["status"] = "OK"
     return jsonify(resp)
 
 
