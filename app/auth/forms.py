@@ -36,8 +36,11 @@ class RegistrationForm(FlaskForm):
             EqualTo("password", message="Passwords must match"),
         ],
     )
-    # recaptcha = RecaptchaField()
+    recaptcha = RecaptchaField()
     # RecaptchaField currently doesn't support csp_nonce()
+    # See unmerged [PR](https://github.com/lepture/flask-wtf/pull/312)
+    # However, despite this we could render the field by hand
+    # and check corectness by RecaptchaField
     submit = SubmitField(_l("Register"))
 
     def validate_username(self, username):

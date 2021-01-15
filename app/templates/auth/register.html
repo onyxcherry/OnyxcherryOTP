@@ -34,7 +34,9 @@
         <label for="recaptcha"></label>
         <script src='https://www.google.com/recaptcha/api.js' async defer nonce="{{ csp_nonce() }}"></script>
         <div class="g-recaptcha" id="recaptcha" data-sitekey="{{ recaptcha_public_key }}"></div>
-
+        {% for error in form.recaptcha.errors %}
+        <p class="help-block">{{ error }}</p>
+        {% endfor %}
     </div>
     <p></p>
     {{ form.submit(class="btn btn-block login-btn mb-4") }}
