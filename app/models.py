@@ -190,7 +190,7 @@ class Webauthn(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.Integer, default=0)
     is_enabled = db.Column(db.Boolean, default=False)
-    user_identifier = db.Column(db.String(86))
+    user_identifier = db.Column(db.LargeBinary(64))
     user_id = db.Column(db.Integer, db.ForeignKey("user.did"))
 
     def __repr__(self):

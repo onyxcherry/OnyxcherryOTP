@@ -307,7 +307,7 @@ def register_begin():
         webauthn_data = Webauthn(
             number=0,
             is_enabled=False,
-            user_identifier=base64.b64encode(user_identifier),
+            user_identifier=user_identifier,
             user_id=database_id,
         )
         db.session.add(webauthn_data)
@@ -347,8 +347,10 @@ def register_complete():
         session["state"], client_data, att_obj
     )
 
+    webauthn_data = Webauthn.query.filter_by(user_id=database_id).first()
+
     new_key = Key(
-        name="TODO",
+        name=f"Key {webauthn_data.number + 1}",
         aaguid=auth_data.credential_data.aaguid,
         credential_id=auth_data.credential_data.credential_id,
         client_data_hash=hashlib.sha256(client_data).digest(),
@@ -360,8 +362,6 @@ def register_complete():
         created=datetime.utcnow(),
         user_id=database_id,
     )
-
-    webauthn_data = Webauthn.query.filter_by(user_id=database_id).first()
 
     if webauthn_data.number <= 10:
         webauthn_data.number += 1
