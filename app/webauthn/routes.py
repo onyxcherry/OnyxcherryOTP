@@ -219,7 +219,7 @@ def render_key_delete(credential_id):
     if webauth.number == 1:
         flash(
             _(
-                "Deleting the key causes deactivating Webauthn"
+                "Deleting the key causes deactivating Webauthn "
                 "for your account!"
             )
         )
