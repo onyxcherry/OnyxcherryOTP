@@ -4,6 +4,7 @@
 {% if any_keys %}
 <h1>{{ _('Your keys:') }}</h1>
 <div id="user-keys"></div>
+<a href="{{ url_for('webauthn.add_key') }}" class="btn btn-success">{{ _('Add key') }}</a>
 {% else %}
 <h1>You don't have any keys!</h1>
 <a href="{{ url_for('webauthn.add_key') }}" class="btn btn-success">{{ _('I would like to add one') }}</a>

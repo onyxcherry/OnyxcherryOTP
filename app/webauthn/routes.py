@@ -27,14 +27,14 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-import base64
 import binascii
 import hashlib
+import json
 import os
 from datetime import datetime
 from typing import Tuple
 
-from app import csrf, db
+from app import db
 from app.models import Key, User, Webauthn
 from app.webauthn import bp
 from app.webauthn.forms import DeleteKey, NameKey
@@ -67,7 +67,6 @@ from flask_login import (
     login_required,
     login_user,
 )
-from werkzeug.urls import url_parse
 
 rp = PublicKeyCredentialRpEntity(Config.RP_ID, "Demo server")
 server = Fido2Server(rp, attestation=Config.ATTESTATION)
@@ -252,7 +251,7 @@ def delete_key():
         db.session.delete(key_to_delete)
         webautn = Webauthn.query.filter_by(user_id=user_database_id).first()
         webautn.number -= 1
-        db.session.delete(webautn)
+        db.session.add(webautn)
         db.session.commit()
         flash(_("Deleted!"))
         return redirect(url_for("webauthn.index"))
@@ -304,6 +303,8 @@ def register_begin():
 
     credentials = get_credentials(user_database_id)
 
+    is_resident = json.loads(request.data)["resident"]
+
     webauthn_data = Webauthn.query.filter_by(user_id=database_id).first()
 
     if webauthn_data is None:
@@ -327,7 +328,7 @@ def register_begin():
             "icon": "https://example.com/image.png",
         },
         credentials,
-        # resident_key=True,
+        resident_key=is_resident,
         user_verification="discouraged",
         authenticator_attachment="cross-platform",
     )

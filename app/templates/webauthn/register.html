@@ -6,6 +6,12 @@
 
 <button id="register-button" class="btn btn-primary btn-lg">{{ _('I understand') }}</button>
 
+<p></p>
+<div class="form-group form-check">
+    <input type="checkbox" class="form-check-input" id="resident">
+    <label class="form-check-label" for="resident">Resident key</label>
+</div>
+
 <script src="/static/js/cbor.js" async defer nonce="{{ csp_nonce() }}"></script>
 <script src="/static/js/register_key.js" async defer nonce="{{ csp_nonce() }}"></script>
 
