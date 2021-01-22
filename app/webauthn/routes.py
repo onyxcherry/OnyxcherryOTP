@@ -169,10 +169,9 @@ def verify_attestation(credential_id):
     att = obtain_att()
     try:
         verification = att.verify(statement, auth_data, client_data_hash)
+        resp["status"] = "OK"
     except InvalidSignature:
         resp["status"] = "error"
-    finally:
-        resp["status"] = "OK"
     return jsonify(resp)
 
 
