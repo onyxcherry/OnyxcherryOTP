@@ -20,7 +20,7 @@ from app.models import (
     generate_sid,
 )
 from app.twofa.forms import CheckOTPCode
-from config import HTTPS_ENABLED, Config
+from config import Config
 from flask import (
     abort,
     flash,
@@ -88,7 +88,7 @@ def login():
                 "token",
                 value=token,
                 max_age=90,
-                secure=HTTPS_ENABLED,
+                secure=Config.HTTPS_ENABLED,
                 httponly=True,
                 samesite="Strict",
             )
@@ -106,7 +106,7 @@ def login():
                 "token",
                 value=token,
                 max_age=90,
-                secure=HTTPS_ENABLED,
+                secure=Config.HTTPS_ENABLED,
                 httponly=True,
                 samesite="Strict",
             )
