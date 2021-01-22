@@ -11,7 +11,9 @@ WORKDIR /home/onyxcherry/OnyxcherryOTP
 
 RUN python -m venv venv && \
     venv/bin/pip install --no-cache-dir -r requirements.txt && \
-    venv/bin/pip install --no-cache-dir  gunicorn==20.0.4 psycopg2-binary==2.8.5
+    venv/bin/pip install --no-cache-dir  gunicorn==20.0.4
+    
+RUN venv/bin/pip install --no-cache-dir psycopg2-binary
 
 
 FROM python:3.9.1-slim-buster
