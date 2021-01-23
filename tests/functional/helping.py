@@ -33,6 +33,11 @@ def delete_key(test_client, data):
     return delete_key_response
 
 
+def get_keys_list(test_client):
+    keys_list_response = test_client.get("/webauthn/keys/list")
+    return keys_list_response
+
+
 def enable_user_2fa(test_client):
     generate_token_response = test_client.get("/twofa/generate_token")
     token_data = generate_token_response.get_data()

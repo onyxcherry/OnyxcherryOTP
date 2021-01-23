@@ -188,7 +188,7 @@ def init_database():
     first_key_for_user8 = Key(
         name="Key 1",
         aaguid=b"",
-        credential_id=b"",
+        credential_id=b"againnotrealbutrequiredtolistkeyproperly",
         client_data_hash=hashlib.sha256(b"a").digest(),
         public_key=b"",
         counter=0,
