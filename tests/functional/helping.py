@@ -6,7 +6,10 @@ from fido2 import cbor
 
 
 def activate_webauthn(test_client):
-    activate_webauthn_response = test_client.get("/webauthn/activate")
+    activate_webauthn_response = test_client.get(
+        "/webauthn/activate", follow_redirects=True
+    )
+    return activate_webauthn_response
 
 
 def enable_user_2fa(test_client):
@@ -86,7 +89,7 @@ def reset_password(test_client, token, new_password):
 
 
 def activate_2fa(test_client):
-    response = test_client.get("twofa/activate", follow_redirects=True)
+    response = test_client.get("/twofa/activate", follow_redirects=True)
     return response
 
 
