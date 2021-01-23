@@ -12,6 +12,13 @@ def activate_webauthn(test_client):
     return activate_webauthn_response
 
 
+def deactivate_webauthn(test_client):
+    deactivate_webauthn_response = test_client.get(
+        "/webauthn/deactivate", follow_redirects=True
+    )
+    return deactivate_webauthn_response
+
+
 def enable_user_2fa(test_client):
     generate_token_response = test_client.get("/twofa/generate_token")
     token_data = generate_token_response.get_data()

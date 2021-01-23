@@ -83,10 +83,16 @@ def init_database():
     )
     user7.set_password("qghjoiwjiklwek")
 
+    user8 = User(
+        username="oliver", sid=generate_sid(), email="oliver@gmail.com",
+    )
+    user8.set_password("2398wqshjduiwd8932")
+
     db.session.add(user4)
     db.session.add(user5)
     db.session.add(user6)
     db.session.add(user7)
+    db.session.add(user8)
     db.session.commit()
 
     got_user4 = User.query.filter_by(username="mark").first()
@@ -174,6 +180,12 @@ def init_database():
     )
     db.session.add(webauthn_for_user6)
     db.session.add(webauthn_for_user7)
+
+    got_user8 = User.query.filter_by(username="oliver").first()
+    webauthn_for_user8 = Webauthn(
+        number=1, is_enabled=False, user_id=got_user8.did
+    )
+    db.session.add(webauthn_for_user8)
 
     db.session.commit()
 
