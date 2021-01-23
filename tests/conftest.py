@@ -185,7 +185,21 @@ def init_database():
     webauthn_for_user8 = Webauthn(
         number=1, is_enabled=False, user_id=got_user8.did
     )
+    key_for_user8 = Key(
+        name="Key 1",
+        aaguid=b"",
+        credential_id=b"",
+        client_data_hash=hashlib.sha256(b"a").digest(),
+        public_key=b"",
+        counter=0,
+        attestation=b"",
+        info="TODO",
+        last_access=datetime.utcnow(),
+        created=datetime.utcnow(),
+        user_id=got_user8.did,
+    )
     db.session.add(webauthn_for_user8)
+    db.session.add(key_for_user8)
 
     db.session.commit()
 
