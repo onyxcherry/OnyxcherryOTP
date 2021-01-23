@@ -1,3 +1,4 @@
+import json
 from io import BytesIO
 
 from app.models import Key, User, Webauthn
@@ -10,7 +11,10 @@ from soft_webauthn import SoftWebauthnDevice
 def test_webauthn_register_new_key(test_client, init_database):
     sign_in_response = sign_in(test_client, "dave", "wselfknskjdksdaiujlj")
     device = SoftWebauthnDevice()
-    pkcco = cbor.decode(test_client.post("/webauthn/register/begin").data)
+    begin_register_response = test_client.post(
+        "/webauthn/register/begin", data=json.dumps({"resident": False})
+    )
+    pkcco = cbor.decode(begin_register_response.data)
 
     attestation = device.create(pkcco, f"https://{TestConfig.RP_ID}")
 

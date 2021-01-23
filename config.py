@@ -2,8 +2,8 @@ import base64
 import datetime
 import logging
 import os
-from distutils.util import strtobool
 from dataclasses import dataclass
+from distutils.util import strtobool
 
 from dotenv import load_dotenv
 
