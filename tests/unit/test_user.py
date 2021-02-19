@@ -1,5 +1,4 @@
 import pytest
-from app.models import User
 
 
 @pytest.mark.skip(reason="Hashing password takes too much time")

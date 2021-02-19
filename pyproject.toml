@@ -19,4 +19,5 @@ profile = "black"
 src_paths = ["isort", "test"]
 skip = ["git", "__pycache__", "venv" ,"virtualenv", "migrations", ".tox", ".pytest_cache"]
 line_length = 79
+honor_noqa = true
 atomic = true

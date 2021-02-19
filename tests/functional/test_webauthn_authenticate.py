@@ -1,11 +1,8 @@
 import uuid
 from datetime import datetime
 from io import BytesIO
-from unittest.mock import patch
 
-import app.webauthn.routes
 from app.models import Key, User, Webauthn
-from app.webauthn.routes import get_credentials
 from conftest import TestConfig
 from fido2 import cbor
 from helping import sign_in

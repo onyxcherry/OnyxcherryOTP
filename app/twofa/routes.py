@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 
-import jwt
 import pyotp
 from app import db
 from app.models import OTP, User
@@ -8,7 +7,6 @@ from app.twofa import bp
 from app.twofa.forms import CheckOTPCode
 from flask import (
     abort,
-    current_app,
     flash,
     jsonify,
     redirect,
@@ -16,8 +14,8 @@ from flask import (
     request,
     url_for,
 )
-from flask_babel import _, gettext
-from flask_babel import lazy_gettext as _l
+from flask_babel import _, gettext  # noqa: F401
+from flask_babel import lazy_gettext as _l  # noqa: F401
 from flask_login import (
     current_user,
     fresh_login_required,

@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from app.models import Key, User, Webauthn
+from app.models import User, Webauthn
 from conftest import TestConfig
 from fido2 import cbor
 from helping import sign_in

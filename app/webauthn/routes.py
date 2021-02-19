@@ -27,14 +27,13 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-import base64
 import binascii
 import hashlib
 import os
 from datetime import datetime
 from typing import Tuple
 
-from app import csrf, db
+from app import db
 from app.models import Key, User, Webauthn
 from app.webauthn import bp
 from app.webauthn.forms import DeleteKey, NameKey
@@ -60,14 +59,13 @@ from flask import (
     url_for,
 )
 from flask_babel import _
-from flask_babel import lazy_gettext as _l
+from flask_babel import lazy_gettext as _l  # noqa: F401
 from flask_login import (
     current_user,
     fresh_login_required,
     login_required,
     login_user,
 )
-from werkzeug.urls import url_parse
 
 rp = PublicKeyCredentialRpEntity(Config.RP_ID, "Demo server")
 server = Fido2Server(rp, attestation=Config.ATTESTATION)
@@ -165,7 +163,7 @@ def verify_attestation():
         obtain_att = Attestation.for_type(fmt)
         att = obtain_att()
         try:
-            verification = att.verify(statement, auth_data, client_data_hash)
+            att.verify(statement, auth_data, client_data_hash)
         except InvalidSignature:
             resp[binascii.b2a_hex(key.credential_id).decode()] = "ERROR"
         finally:
@@ -426,8 +424,6 @@ def authenticate_complete():
         auth_data,
         signature,
     )
-
-    webauthn = Webauthn.query.filter_by(user_id=database_id).first()
 
     current_counter = int(auth_data.counter)
 

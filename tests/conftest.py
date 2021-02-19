@@ -1,13 +1,6 @@
-import pickle
-import uuid
-from datetime import datetime
-
-import pyotp
 import pytest
 from app import Config, create_app, db
 from app.models import User, Webauthn, generate_sid
-from fido2.ctap2 import cbor
-from soft_webauthn import SoftWebauthnDevice
 
 
 class TestConfig(Config):

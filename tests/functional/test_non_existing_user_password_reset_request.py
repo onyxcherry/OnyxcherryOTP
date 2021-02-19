@@ -1,6 +1,5 @@
 from unittest import mock
 
-from app.models import User
 from helping import reset_password_request
 
 

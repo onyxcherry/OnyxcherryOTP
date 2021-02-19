@@ -1,4 +1,3 @@
-from app.models import User
 from helping import delete_session_cookie, get_index, sign_in_no_fr
 
 

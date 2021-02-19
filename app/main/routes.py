@@ -1,6 +1,6 @@
 from app.main import bp
 from app.models import OTP, User
-from flask import current_app, render_template, request
+from flask import render_template
 from flask_babel import _
 from flask_login import current_user, login_required
 

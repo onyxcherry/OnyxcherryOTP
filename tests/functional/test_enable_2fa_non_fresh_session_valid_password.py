@@ -1,4 +1,3 @@
-import pyotp
 from helping import (
     activate_2fa,
     enable_user_2fa,

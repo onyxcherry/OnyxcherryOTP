@@ -1,8 +1,6 @@
 import json
 
 import pyotp
-from app.models import User, Webauthn
-from fido2 import cbor
 
 
 def activate_webauthn(test_client):
