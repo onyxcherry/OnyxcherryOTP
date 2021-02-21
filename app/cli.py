@@ -11,7 +11,7 @@ def register(app):
     @translate.command()
     @click.argument("lang")
     def init(lang):
-        """Initialize a new language."""
+        """Initialize a new language. test"""
         if os.system("pybabel extract -F babel.cfg -k _l -o messages.pot ."):
             raise RuntimeError("extract command failed")
         if os.system(
