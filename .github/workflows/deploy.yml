@@ -7,7 +7,7 @@ on:
       - completed
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,5 +19,4 @@ jobs:
           port: ${{ secrets.PORT }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSHKEY }}
-          PROJECT_PATH: ${{ secrets.PROJECT_PATH }}
-          script: "cd $PROJECT_PATH && git pull && pip install -e . && systemctl --user restart onyxcherryauth.service"
+          script: "cd ${{ secrets.PROJECT_PATH }} && git pull && ${{ secrets.PROJECT_PATH }}/venv/bin/pip install -e . && systemctl --user restart onyxcherryauth.service"
