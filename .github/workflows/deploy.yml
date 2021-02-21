@@ -15,8 +15,8 @@ jobs:
       - name: Update code
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST }}
-          port: ${{ secrets.PORT }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSHKEY }}
-          script: "cd ${{ secrets.PROJECT_PATH }} && git pull && ${{ secrets.PROJECT_PATH }}/venv/bin/pip install -e . && systemctl --user restart onyxcherryauth.service"
+          host: srv07.mikr.us
+          port: 10223
+          username: onyxauth
+          key: ${{ secrets.MYSSHKEY }}
+          script: "cd /home/onyxauth/OnyxcherryOTP && git pull && /home/onyxauth/OnyxcherryOTP/venv/bin/pip install -e . && systemctl --user restart onyxcherryauth.service"
