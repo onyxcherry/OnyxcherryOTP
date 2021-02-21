@@ -43,6 +43,9 @@ class RegistrationForm(FlaskForm):
     # and check corectness by RecaptchaField
     submit = SubmitField(_l("Register"))
 
+    # custom validation function - they are handled by WTF's Form class method
+    # validate(self, extra_validators=None)
+    # [https://github.com/wtforms/wtforms/blob/244c8d6b15accb3e2efd622241e5f7c1cc8abb9d/wtforms/form.py#L299] # noqa: E501, B950
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
         if user or not username.data.isascii():

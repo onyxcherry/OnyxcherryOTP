@@ -13,3 +13,4 @@ virtualenv
 htmlcov
 *.mo
 .idea
+logs/
