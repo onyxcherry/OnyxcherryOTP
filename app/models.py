@@ -89,7 +89,7 @@ class User(UserMixin, db.Model):
             },
             current_app.config["TWOFA_SECRET_KEY"],
             algorithm="HS256",
-        ).decode("utf-8")
+        )
 
     def get_reset_password_token(self, value, expires_in=600):
         return jwt.encode(
@@ -100,7 +100,7 @@ class User(UserMixin, db.Model):
             },
             current_app.config["SECRET_KEY"],
             algorithm="HS256",
-        ).decode("utf-8")
+        )
 
     @staticmethod
     def get_random_base64_value():

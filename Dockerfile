@@ -3,9 +3,8 @@ FROM python:3.8.5-slim-buster
 RUN adduser --disabled-password --gecos "" onyxcherry
 WORKDIR /home/onyxcherry
 
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends git
+RUN apt-get -qq update && \
+    apt-get install -qq -y --no-install-recommends git
 
 RUN git clone https://github.com/onyxcherry/OnyxcherryOTP.git
 WORKDIR /home/onyxcherry/OnyxcherryOTP
