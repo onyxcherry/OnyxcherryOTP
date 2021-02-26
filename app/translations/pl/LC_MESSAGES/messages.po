@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.4.2\n"
 "Report-Msgid-Bugs-To: tomek@onyxcherry.pl\n"
-"POT-Creation-Date: 2020-09-03 21:46+0200\n"
+"POT-Creation-Date: 2021-01-16 12:39+0100\n"
 "PO-Revision-Date: 2020-06-21 10:53+0200\n"
 "Last-Translator: Tomasz Wiśniewski tomek@onyxcherry.pl\n"
 "Language: pl\n"
@@ -20,11 +20,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: app/__init__.py:17
+#: app/__init__.py:21
 msgid "Please log in to access this page."
 msgstr "Zaloguj się, by uzyskać dostęp do tej strony."
 
-#: app/__init__.py:19
+#: app/__init__.py:23
 msgid "To protect your account, please reauthenticate to access this page."
 msgstr "Potwierdź swoją tożsamość. To ważne dla bezpieczeństwa konta."
 
@@ -36,8 +36,8 @@ msgstr "[Onyxcherry OTP] Zresetuj swoje hasło"
 msgid "Username"
 msgstr "Nazwa użytkownika"
 
-#: app/auth/forms.py:17 app/auth/forms.py:30 app/auth/forms.py:60
-#: app/auth/forms.py:73
+#: app/auth/forms.py:17 app/auth/forms.py:30 app/auth/forms.py:64
+#: app/auth/forms.py:77
 msgid "Password"
 msgstr "Hasło"
 
@@ -45,11 +45,11 @@ msgstr "Hasło"
 msgid "Remember me"
 msgstr "Zapamiętaj mnie"
 
-#: app/auth/forms.py:19 app/templates/index.html:31
+#: app/auth/forms.py:19 app/templates/index.html:32
 msgid "Sign in"
 msgstr "Zaloguj się"
 
-#: app/auth/forms.py:27 app/auth/forms.py:54
+#: app/auth/forms.py:27 app/auth/forms.py:58
 msgid "Email"
 msgstr "Email"
 
@@ -57,85 +57,90 @@ msgstr "Email"
 msgid "Repeat Password"
 msgstr "Powtórz hasło"
 
-#: app/auth/forms.py:40 app/auth/routes.py:125
+#: app/auth/forms.py:44 app/auth/routes.py:145
 msgid "Register"
 msgstr "Zarejestruj się"
 
-#: app/auth/forms.py:45
+#: app/auth/forms.py:49
 msgid "Please use a different username."
 msgstr "Proszę wybrać inną nazwę użytkownika."
 
-#: app/auth/forms.py:50
+#: app/auth/forms.py:54
 msgid "Please use a different email address."
 msgstr "Proszę użyć innego adresu email."
 
-#: app/auth/forms.py:55
+#: app/auth/forms.py:59
 msgid "Request password reset"
 msgstr "Zresetuj hasło"
 
-#: app/auth/forms.py:63
+#: app/auth/forms.py:67
 msgid "Repeat password"
 msgstr "Powtórz hasło"
 
-#: app/auth/forms.py:69
+#: app/auth/forms.py:73
 msgid "Reset my password"
 msgstr "Zresetuj moje hasło"
 
-#: app/auth/forms.py:74 app/templates/twofa/turn_on.html:45
-#: app/twofa/forms.py:9
+#: app/auth/forms.py:78 app/templates/twofa/turn_on.html:28
+#: app/twofa/forms.py:11 app/webauthn/forms.py:12 app/webauthn/forms.py:17
 msgid "Submit"
 msgstr "Zatwierdź"
 
-#: app/auth/routes.py:73
+#: app/auth/routes.py:76
 msgid "Invalid username or password"
 msgstr "Niepoprawna nazwa użytkownika lub hasło"
 
-#: app/auth/routes.py:99
+#: app/auth/routes.py:118
 msgid "Sign In"
 msgstr "Zaloguj się"
 
-#: app/auth/routes.py:122
+#: app/auth/routes.py:141
 msgid "Congratulations, you are now a registered user!"
 msgstr "Świetnie, jesteś zarejestrowanym użytkownikiem!"
 
-#: app/auth/routes.py:138 app/auth/routes.py:175
+#: app/auth/routes.py:160 app/auth/routes.py:197
 msgid "Check your email for the instructions to reset your password."
 msgstr "Sprawdź skrzynkę obiorczą, by zresetować hasło."
 
-#: app/auth/routes.py:180
+#: app/auth/routes.py:202
 msgid "Reset Password"
 msgstr "Zresetuj hasło"
 
-#: app/auth/routes.py:208
+#: app/auth/routes.py:230
 msgid "Invalid or expired token"
 msgstr "Niepoprawny lub nieważny token"
 
-#: app/auth/routes.py:213
+#: app/auth/routes.py:235
 msgid "Your password has been reset."
 msgstr "Twoje hasło zostało zresetowane."
 
-#: app/auth/routes.py:232
+#: app/auth/routes.py:254
 msgid "Invalid password"
 msgstr "Niepoprawne hasło"
 
-#: app/auth/routes.py:237
+#: app/auth/routes.py:259
 msgid "Refresh your session"
 msgstr "Odnów swoją sesję"
 
-#: app/auth/routes.py:249
+#: app/auth/routes.py:271
 msgid "Revoked other sessions."
 msgstr "Unieważniono pozostałe sesje."
 
-#: app/main/routes.py:11 app/templates/index.html:27
+#: app/auth/routes.py:282 app/auth/routes.py:315 app/auth/routes.py:332
+#: app/twofa/routes.py:138
+msgid "Invalid token!"
+msgstr "Niepoprawny token!"
+
+#: app/main/routes.py:11 app/templates/index.html:28
 msgid "Home"
 msgstr "Strona główna"
 
-#: app/main/routes.py:23 app/main/routes.py:28 app/templates/index.html:29
+#: app/main/routes.py:23 app/main/routes.py:28 app/templates/index.html:30
 #: app/templates/settings/settings.html:4
 msgid "Settings"
 msgstr "Ustawienia"
 
-#: app/templates/base.html:10 app/templates/index.html:9
+#: app/templates/base.html:11 app/templates/index.html:10
 msgid "Welcome to Onyxcherry OTP"
 msgstr "Witaj w serwisie Onyxcherry OTP"
 
@@ -147,32 +152,47 @@ msgstr "Warunki użytkowania."
 msgid "Privacy policy"
 msgstr "Polityka prywatności"
 
-#: app/templates/index.html:33
+#: app/templates/index.html:34
 msgid "Logout"
 msgstr "Wyloguj się"
 
-#: app/templates/index.html:49
+#: app/templates/index.html:50
 msgid "Hello"
 msgstr "Cześć"
 
-#: app/templates/index.html:50
+#: app/templates/index.html:51
 msgid ""
 "This is my implementation of two-factor authentication app in Flask with "
-"required fresh login,\n"
-"        revoking other sessions and translations handled by Flask-Babel."
-msgstr ""
-"To moja implementacja aplikacji z uwierzytelnianiem dwuskładnikowym "
-"opartej na Flasku, wymagającej świeżej sesji do kluczowych operacji, "
-"pozwalającej na unieważnienie pozostałych sesji oraz zapewniającej "
-"tłumaczenia dzięki Flask-Babel."
+"required fresh\n"
+"        login, revoking other sessions and translations handled by Flask-"
+"Babel."
+msgstr "To moja implementacja aplikacji z uwierzytelnianiem dwuskładnikowym opartej na Flasku, wymagającej świeżej sesji do kluczowych operacji, pozwalającej na unieważnienie pozostałych sesji oraz zapewniającej tłumaczenia dzięki Flask-Babel."
 
-#: app/templates/index.html:52
+#: app/templates/index.html:53
 msgid "Get more informations below:"
 msgstr "Uzyskaj więcej informacji poniżej:"
 
-#: app/templates/index.html:54
+#: app/templates/index.html:55
 msgid "Check source"
 msgstr "Sprawdź"
+
+#: app/templates/auth/available_options.html:3
+msgid "Choose an authentication method below:"
+msgstr "Wybierz metodę uwierzytelnienia poniżej:"
+
+#: app/templates/auth/available_options.html:6
+#: app/templates/settings/settings.html:15
+#: app/templates/webauthn/overview.html:4
+msgid "Webauthn"
+msgstr "Webauthn"
+
+#: app/templates/auth/available_options.html:9
+msgid "One Time Password"
+msgstr "One Time Password"
+
+#: app/templates/auth/available_options.html:12
+msgid "Backup code"
+msgstr "Kody zapasowe"
 
 #: app/templates/auth/login.html:22
 msgid "Forgot your password?"
@@ -206,11 +226,11 @@ msgstr "Administrator serwisu został powiadomiony. Przepraszamy za niedogodnoś
 msgid "Turn off 2FA"
 msgstr "Wyłącz 2FA"
 
-#: app/templates/settings/settings.html:10 app/templates/twofa/turn_on.html:24
+#: app/templates/settings/settings.html:10 app/templates/twofa/turn_on.html:6
 msgid "Turn on 2FA"
 msgstr "Włącz 2FA"
 
-#: app/templates/settings/settings.html:16
+#: app/templates/settings/settings.html:20
 msgid "Revoke other sessions"
 msgstr "Unieważnij pozostałe sesje"
 
@@ -226,55 +246,133 @@ msgstr ""
 "Logowanie nie wymaga już podawanie kodu 2FA. Rozważ włączenie tej opcji "
 "ponownie z uwagi na bezpieczeństwo."
 
-#: app/templates/twofa/turn_on.html:26
+#: app/templates/twofa/turn_on.html:8
 msgid "You are activating two factor authentication."
 msgstr "Aktywujesz uwierzytelnianie dwuskładnikowe."
 
-#: app/templates/twofa/turn_on.html:28
+#: app/templates/twofa/turn_on.html:10
 msgid "Please keep the secret private."
 msgstr "Nie przekazuj tego kodu innym."
 
-#: app/templates/twofa/turn_on.html:29
+#: app/templates/twofa/turn_on.html:11
 msgid "Scan the QR and type the code from app below."
 msgstr "Zeskanuj kod QR i przepisz wygenerowany kod."
 
-#: app/templates/twofa/turn_on.html:30
+#: app/templates/twofa/turn_on.html:12
 msgid "Use an OTP app, e.g. Authy or Google Authenticator."
 msgstr "Użyj aplikacji, np. Authy lub Google Authenticator."
 
-#: app/templates/twofa/turn_on.html:36
+#: app/templates/twofa/turn_on.html:18
 msgid "Show secret as text"
 msgstr "Pokaż jako tekst"
 
-#: app/templates/twofa/turn_on.html:48
+#: app/templates/twofa/turn_on.html:31 app/templates/webauthn/register.html:7
 msgid "I understand"
 msgstr "Rozumiem"
 
-#: app/twofa/forms.py:8
+#: app/templates/webauthn/authenticate.html:6
+msgid "Check it"
+msgstr "Sprawdź"
+
+#: app/templates/webauthn/delete_key.html:4
+msgid "Delete key with credential id "
+msgstr "Usunąć klucz z identyfikatorem "
+
+#: app/templates/webauthn/login_with_webauthn.html:3
+#: app/templates/webauthn/register.html:5
+msgid "Insert security key to slot or bring it to the device. Press the gold ring"
+msgstr ""
+"Włóż klucz bezpieczeństwa do portu lub przyłóż go do urządzenia. Dotknij "
+"złotej płytki"
+
+#: app/templates/webauthn/login_with_webauthn.html:7
+msgid "I inserted"
+msgstr "Włożyłem"
+
+#: app/templates/webauthn/manage_keys.html:5
+msgid "Your keys:"
+msgstr "Twoje klucze:"
+
+#: app/templates/webauthn/manage_keys.html:7
+msgid "Add key"
+msgstr "Dodaj klucz"
+
+#: app/templates/webauthn/manage_keys.html:10
+msgid "I would like to add one"
+msgstr "Chciałbym dodać"
+
+#: app/templates/webauthn/name_key.html:4
+msgid "Name registered key"
+msgstr "Nazwij zarejestrowany klucz"
+
+#: app/templates/webauthn/overview.html:6
+msgid "Turn off Webauthn"
+msgstr "Wyłącz Webauthn"
+
+#: app/templates/webauthn/overview.html:8
+msgid "Turn on Webauthn"
+msgstr "Włącz Webauthn"
+
+#: app/templates/webauthn/overview.html:12
+msgid "Manage keys"
+msgstr "Zarządzaj kluczami"
+
+#: app/templates/webauthn/register.html:4
+msgid "Register new key"
+msgstr "Zarejestruj nowy klucz"
+
+#: app/twofa/forms.py:9
 msgid "Code: "
 msgstr "Kod: "
 
-#: app/twofa/routes.py:52
+#: app/twofa/routes.py:51
 msgid "2FA"
 msgstr "2FA"
 
-#: app/twofa/routes.py:98
+#: app/twofa/routes.py:97
 msgid "An error occured. Please contact the administrator."
 msgstr "Wystąpił błąd. Skontaktuj się z administratorem."
 
-#: app/twofa/routes.py:114
+#: app/twofa/routes.py:112
 msgid "Turned on 2FA. You could go to the main page."
 msgstr "Włączono 2FA. Możesz przejść do strony głównej."
 
-#: app/twofa/routes.py:117
+#: app/twofa/routes.py:115
 msgid "Invalid OTP code! Try again."
 msgstr "Niepoprawny kod! Spróbuj ponownie."
 
-#: app/twofa/routes.py:140
-msgid "Invalid token!"
-msgstr "Niepoprawny token!"
-
-#: app/twofa/routes.py:157
+#: app/twofa/routes.py:155
 msgid "Invalid OTP code"
 msgstr "Niepoprawny kod OTP"
 
+#: app/webauthn/forms.py:10
+msgid "Name: "
+msgstr "Nazwa: "
+
+#: app/webauthn/routes.py:207
+msgid "Correctly!"
+msgstr "Udało się!"
+
+#: app/webauthn/routes.py:221
+msgid "Deleting the key causes deactivating Webauthn for your account!"
+msgstr "Usunięcie klucza spowoduje zdezktywowanie Webauthn na Twoim koncie!"
+
+#: app/webauthn/routes.py:256
+msgid "Deleted!"
+msgstr "Usunięto!"
+
+#: app/webauthn/routes.py:273
+msgid "Enabled Webauthn!"
+msgstr "Włączono Webauthn!"
+
+#: app/webauthn/routes.py:276
+msgid "You have to register keys before"
+msgstr "Najpierw zarejestruj klucze!"
+
+#: app/webauthn/routes.py:291
+msgid "Deactivated webauthn!"
+msgstr "Wyłączono Webauthn!"
+
+#: app/webauthn/routes.py:378
+msgid "Too much keys registered"
+msgstr "Zbyt dużo kluczy zarejestrowanych!"

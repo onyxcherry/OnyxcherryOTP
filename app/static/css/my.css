@@ -16,3 +16,7 @@
 #webauthn-image {
     max-width: 10rem;
 }
+
+.form-check {
+    transform: scale(1.5);
+}

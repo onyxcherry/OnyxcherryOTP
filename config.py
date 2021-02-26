@@ -3,45 +3,12 @@ import datetime
 import logging
 import os
 from dataclasses import dataclass
+from distutils.util import strtobool
 
 from dotenv import load_dotenv
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, ".env"))
-
-HTTPS_ENABLED = False
-if os.environ.get("HTTPS_ENABLED", "").lower() == "true":
-    HTTPS_ENABLED = True
-
-
-@dataclass
-class CSPSettings:
-    csp = {
-        "default-src": "'self'",
-        "script-src": ["'strict-dynamic'"],
-        "style-src": ["'self'"],
-        "frame-src": ["https://www.google.com/recaptcha/"],
-        "object-src": "'none'",
-        "base-uri": "'none'",
-        "report-uri": "https://onyxcherryotp.report-uri.com/r/d/csp/enforce",
-    }
-    content_security_policy = csp
-    content_security_policy_nonce_in = ["script-src", "style-src"]
-    force_https = HTTPS_ENABLED
-    frame_options = "DENY"
-    session_cookie_secure = HTTPS_ENABLED
-    session_cookie_http_only = True
-    strict_transport_security = True
-    referrer_policy = "strict-origin-when-cross-origin"
-
-    # Consider adding 'unsafe-inline'
-    # (ignored by browsers supporting nonces/hashes)
-    # to be backward compatible with older browsers.
-
-    # Consider adding https: and http: url schemes
-    # (ignored by browsers supporting 'strict-dynamic')
-    # to be backward compatible with older browsers.
-    # [https://csp-evaluator.withgoogle.com/]
 
 
 class Config(object):
@@ -61,15 +28,16 @@ class Config(object):
     MAIL_SERVER = os.environ.get("MAIL_SERVER")
     MAIL_PORT = int(os.environ.get("MAIL_PORT") or 465)
 
-    TESTING = os.environ.get("TESTING") is not None
+    TESTING = strtobool(os.environ.get("TESTING") or "true")
 
-    WTF_CSRF_ENABLED = os.environ.get("WTF_CSRF_ENABLED") or True
+    WTF_CSRF_ENABLED = strtobool(os.environ.get("WTF_CSRF_ENABLED") or "true")
 
     if TESTING:
         WTF_CSRF_ENABLED = False
 
     # Note that emails isn't sending when TESTING is True
-    if os.environ.get("MAIL_LOCALHOST") is not None or TESTING:
+    MAIL_LOCALHOST = strtobool(os.environ.get("MAIL_LOCALHOST") or "true")
+    if MAIL_LOCALHOST or TESTING:
         MAIL_SERVER = "localhost"
         MAIL_PORT = "8465"
         os.environ["MAIL_SERVER"] = "localhost"
@@ -78,6 +46,8 @@ class Config(object):
     ADMINS = ["postmaster@onyxcherry.pl"]
 
     LANGUAGES = ["en", "pl"]
+
+    HTTPS_ENABLED = strtobool(os.environ.get("HTTPS_ENABLED") or "false")
 
     SESSION_COOKIE_SECURE = HTTPS_ENABLED
     SESSION_COOKIE_HTTPONLY = True
@@ -110,6 +80,36 @@ class Config(object):
 
     # Very useful when debugging especially templates. Change to True if needed
     EXPLAIN_TEMPLATE_LOADING = False
+
+
+@dataclass
+class CSPSettings:
+    csp = {
+        "default-src": "'self'",
+        "script-src": ["'strict-dynamic'"],
+        "style-src": ["'self'"],
+        "frame-src": ["https://www.google.com/recaptcha/"],
+        "object-src": "'none'",
+        "base-uri": "'none'",
+        "report-uri": "https://onyxcherryotp.report-uri.com/r/d/csp/enforce",
+    }
+    content_security_policy = csp
+    content_security_policy_nonce_in = ["script-src", "style-src"]
+    force_https = Config.HTTPS_ENABLED
+    frame_options = "DENY"
+    session_cookie_secure = Config.HTTPS_ENABLED
+    session_cookie_http_only = True
+    strict_transport_security = True
+    referrer_policy = "strict-origin-when-cross-origin"
+
+    # Consider adding 'unsafe-inline'
+    # (ignored by browsers supporting nonces/hashes)
+    # to be backward compatible with older browsers.
+
+    # Consider adding https: and http: url schemes
+    # (ignored by browsers supporting 'strict-dynamic')
+    # to be backward compatible with older browsers.
+    # [https://csp-evaluator.withgoogle.com/]
 
 
 def setup_logger(name, log_file, level=logging.INFO):

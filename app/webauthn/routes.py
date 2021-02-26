@@ -29,6 +29,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import binascii
 import hashlib
+import json
 import os
 from datetime import datetime
 from typing import Tuple
@@ -147,9 +148,9 @@ def list_keys():
     return jsonify(resp)
 
 
-@bp.route("/verify_attestation")
+@bp.route("/verify_attestation/<credential_id>")
 @login_required
-def verify_attestation():
+def verify_attestation(credential_id):
     user_id = current_user.get_id()
     user_database_id = User.get_database_id(user_id)
     resp = {}
@@ -214,7 +215,7 @@ def render_key_delete(credential_id):
     if webauth.number == 1:
         flash(
             _(
-                "Deleting the key causes deactivating Webauthn"
+                "Deleting the key causes deactivating Webauthn "
                 "for your account!"
             )
         )
@@ -246,7 +247,7 @@ def delete_key():
         db.session.delete(key_to_delete)
         webautn = Webauthn.query.filter_by(user_id=user_database_id).first()
         webautn.number -= 1
-        db.session.delete(webautn)
+        db.session.add(webautn)
         db.session.commit()
         flash(_("Deleted!"))
         return redirect(url_for("webauthn.index"))
@@ -298,6 +299,8 @@ def register_begin():
 
     credentials = get_credentials(user_database_id)
 
+    is_resident = json.loads(request.data)["resident"]
+
     webauthn_data = Webauthn.query.filter_by(user_id=database_id).first()
 
     if webauthn_data is None:
@@ -321,7 +324,7 @@ def register_begin():
             "icon": "https://example.com/image.png",
         },
         credentials,
-        # resident_key=True,
+        resident_key=is_resident,
         user_verification="discouraged",
         authenticator_attachment="cross-platform",
     )

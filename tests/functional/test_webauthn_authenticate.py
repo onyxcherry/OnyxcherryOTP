@@ -1,41 +1,36 @@
-import uuid
-from datetime import datetime
 from io import BytesIO
 
 from app.models import Key, User, Webauthn
-from conftest import TestConfig
+from conftest import KeyList, TestConfig
 from fido2 import cbor
+from fido2.cose import ES256
 from helping import sign_in
 from soft_webauthn import SoftWebauthnDevice
 
 
 def test_webauthn_authenticate(test_client, init_database):
     sign_in_response = sign_in(
-        test_client, "mark", "c1c149afbf4c8996fb92427ae41e4649b934ca"
+        test_client, "jennie", "9df1c362e4df3e51edd1acde9"
     )
 
     device = SoftWebauthnDevice()
-    device.cred_init(TestConfig.RP_ID, uuid.uuid4().hex.encode())
-    registered_credential = device.cred_as_attested()
+    user = User.query.filter_by(username="jennie").first()
+    webauthn = Webauthn.query.filter_by(user_id=user.did).first()
+    user_handle = webauthn.user_identifier
 
-    user4 = User.query.filter_by(username="mark").first()
-    webauthn_for_user4 = Webauthn.query.filter_by(user_id=user4.did).first()
+    device.cred_init(TestConfig.RP_ID, user_handle)
 
-    key_created_date = datetime.utcnow()
-    key_last_access = datetime.utcnow()
-    already_registered_key = Key(
-        name="mykey1",
-        aaguid=registered_credential.aaguid,
-        credential_id=registered_credential.credential_id,
-        public_key=cbor.encode(registered_credential.public_key),
-        counter=0,
-        last_access=key_last_access,
-        created=key_created_date,
-        user_id=user4.did,
+    device.private_key = KeyList.priv_one
+
+    user5_first_security_key_public_key = ES256.from_cryptography_key(
+        device.private_key.public_key()
     )
-
-    init_database.session.add(already_registered_key)
-    init_database.session.commit()
+    key = (
+        Key.query.filter_by(user_id=user.did)
+        .filter_by(public_key=cbor.encode(user5_first_security_key_public_key))
+        .first()
+    )
+    device.credential_id = key.credential_id
 
     pkcro = cbor.decode(test_client.post("/webauthn/authenticate/begin").data)
 
@@ -58,3 +53,6 @@ def test_webauthn_authenticate(test_client, init_database):
     authentication_response = cbor.decode(raw_response.data)
 
     assert authentication_response == {"status": "OK"}
+
+    settings_response = test_client.get("/settings")
+    assert settings_response.status_code == 200

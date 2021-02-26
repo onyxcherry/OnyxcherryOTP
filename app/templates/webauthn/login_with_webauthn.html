@@ -1,6 +1,6 @@
 {% extends 'form_page.html' %}
 {% block forms %}
-<p>{{ _('Insert security key to slot or bring it to the device and press the gold ring') }}</p>
+<p>{{ _('Insert security key to slot or bring it to the device. Press the gold ring') }}</p>
 <script src="/static/js/cbor.js" nonce="{{ csp_nonce() }}"></script>
 <script src="/static/js/authenticate_by_key.js" async defer nonce="{{ csp_nonce() }}"></script>
 

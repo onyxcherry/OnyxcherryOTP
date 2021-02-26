@@ -4,7 +4,36 @@ import pyotp
 
 
 def activate_webauthn(test_client):
-    activate_webauthn_response = test_client.get("/webauthn/activate")
+    activate_webauthn_response = test_client.get(
+        "/webauthn/activate", follow_redirects=True
+    )
+    return activate_webauthn_response
+
+
+def deactivate_webauthn(test_client):
+    deactivate_webauthn_response = test_client.get(
+        "/webauthn/deactivate", follow_redirects=True
+    )
+    return deactivate_webauthn_response
+
+
+def name_key(test_client, data):
+    name_key_response = test_client.post(
+        "/webauthn/keys/name", data=data, follow_redirects=True
+    )
+    return name_key_response
+
+
+def delete_key(test_client, data):
+    delete_key_response = test_client.post(
+        "/webauthn/keys/delete", data=data, follow_redirects=True
+    )
+    return delete_key_response
+
+
+def get_keys_list(test_client):
+    keys_list_response = test_client.get("/webauthn/keys/list")
+    return keys_list_response
 
 
 def enable_user_2fa(test_client):
@@ -84,7 +113,7 @@ def reset_password(test_client, token, new_password):
 
 
 def activate_2fa(test_client):
-    response = test_client.get("twofa/activate", follow_redirects=True)
+    response = test_client.get("/twofa/activate", follow_redirects=True)
     return response
 
 

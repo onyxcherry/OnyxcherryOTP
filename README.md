@@ -61,30 +61,71 @@ flask shell
 ```
 
 ### Run
-```
+
+``` 
 flask run
 ```
 
 or - on production - use [Gunicorn](https://gunicorn.org/).
 
 ---
-Alternatively - for development - run the app with https (generate own self-signed SSL certs with [mkcert](https://github.com/FiloSottile/mkcert) or [openssl](https://devcenter.heroku.com/articles/ssl-certificate-self)):
-```
-gunicorn --bind :5777 --certfile /path/to/server.crt --keyfile /path/to/server.key --access-logfile - --error-logfile - --reload onyxcherryotp:app
+Whether or not development purpose, you have to run the app with https if you want to use Webauthn: 
+
+1. Generate own self-signed SSL certs with [mkcert](https://github.com/FiloSottile/mkcert) or [openssl](https://devcenter.heroku.com/articles/ssl-certificate-self))
+2. Run the app with https:
+
+``` 
+gunicorn --bind 127.0.0.1:5777:5777 --certfile /path/to/server.crt --keyfile /path/to/server.key --access-logfile - --error-logfile - --reload onyxcherryotp:app
 ```
 
-#### Running tests
+### Docker
+
+1. Build the image
+
+``` 
+docker build -t onyxcherryotp:commit_id -f Dockerfile .
 ```
-pytest
+
+2. Copy or create `.env` file, add or update variables, especialy `DATABASE_URL`
+3. Run the database server, create a database and tables (by running migration scripts or `flask shell` and `db.create_all()`)
+3. Run the container
+
+``` 
+docker run --name onyxcherryotp_commit_id_one -d -p 127.0.0.1:5333:5777 --mount type=bind,source=/path/outside/docker/to/config.py,destination=/home/onyxcherry/OnyxcherryOTP/config.py,readonly --mount type=bind,source=/path/outside/docker/to/.env,destination=/home/onyxcherry/OnyxcherryOTP/.env,readonly onyxcherryotp:commit_id
 ```
-(you might have typed `pip install -e .`)
 
 ---
 
-OnyxcherryOTP uses SendGrid to sending emails. Set `MAIL_LOCALHOST=True` in the .env if you want to send emails to localhost.  
-Type 
+#### Note about environment variables:
+
+Both Gunicorn (due to at least 2 workers) and multiple containers of Docker need to specify **same** environment variables, especially `SECRET_KEY` . Unless specified, you will have troubles with correctly cookies' sign.
+
+Therefore use e.g
 
 ``` 
+python -c 'from os import urandom; from base64 import b64encode; print(b64encode(urandom(32)).decode("utf-8"))'
+```
+
+and pass it as SECRET_KEY.  
+
+**Update other variables**.
+
+#### Running tests
+
+``` 
+pytest
+```
+
+(you might have typed `pip install -e .` )
+
+---
+
+OnyxcherryOTP uses SendGrid to sending emails. Set `MAIL_LOCALHOST=True` in the .env if you want to send emails to localhost.
+
+If so type 
+
+``` 
+
 python3 -m smtpd -n -c DebuggingServer localhost:8465
 ```
 
