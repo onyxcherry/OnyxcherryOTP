@@ -7,7 +7,7 @@ from time import time
 from typing import Tuple
 
 import jwt
-from app import bcrypt, db, login
+from app import db, flask_bcrypt, login
 from flask import current_app
 from flask_login import UserMixin
 
@@ -29,6 +29,7 @@ class User(UserMixin, db.Model):
     sid = db.Column(db.Integer)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
+    # Bcrypt ignores bytes beyond 72th but it isn't necessary to inform about
     password_hash = db.Column(db.String(128))
     otp = db.relationship("OTP", backref="user", uselist=False)
     webauthn = db.relationship("Webauthn", backref="user", uselist=False)
@@ -72,13 +73,13 @@ class User(UserMixin, db.Model):
         return_value = f"{self.did}{padded_sid}"
         return return_value
 
-    def set_password(self, password):
-        self.password_hash = bcrypt.generate_password_hash(
-            password, 13
-        ).decode("utf-8")
+    def set_password(self, password: bytes):
+        # do not explicit pass Bcrypt log rounds -
+        # instead specify that in BCRYPT_LOG_ROUNDS environment
+        self.password_hash = flask_bcrypt.generate_password_hash(password)
 
-    def check_password(self, password):
-        return bcrypt.check_password_hash(self.password_hash, password)
+    def check_password(self, password: bytes):
+        return flask_bcrypt.check_password_hash(self.password_hash, password)
 
     def set_valid_credentials(self, remember_me, expires_in=60):
         return jwt.encode(

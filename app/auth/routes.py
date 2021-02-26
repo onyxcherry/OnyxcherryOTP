@@ -72,7 +72,14 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
-        if user is None or not user.check_password(form.password.data):
+        if user is None:
+            user = User(
+                password_hash=(
+                    b"$2b$12$EFwWEz8m9."
+                    b"9tlZ708naK4OIyrPqb2mMaM0fUEYWOjaYSmOghPFOQu"
+                )
+            )
+        if not user.check_password(form.password.data):
             flash(_("Invalid username or password"))
             return redirect(url_for("auth.login"))
         user_otp = OTP.query.filter_by(user_id=user.did).first()

@@ -29,7 +29,7 @@ login.needs_refresh_message_category = "info"
 # cookie by remember-me option
 
 mail = Mail()
-bcrypt = Bcrypt()
+flask_bcrypt = Bcrypt()
 babel = Babel()
 csrf = CSRFProtect()
 talisman = Talisman()
@@ -53,6 +53,7 @@ def create_app(config_class=Config):
     mail.init_app(app)
     csrf.init_app(app)
     babel.init_app(app)
+    flask_bcrypt.init_app(app)
 
     csp = CSPSettings()
     talisman.init_app(

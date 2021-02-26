@@ -78,6 +78,8 @@ class Config(object):
 
     ATTESTATION = os.environ.get("ATTESTATION") or "direct"
 
+    BCRYPT_LOG_ROUNDS = 13
+
     # Very useful when debugging especially templates. Change to True if needed
     EXPLAIN_TEMPLATE_LOADING = False
 
