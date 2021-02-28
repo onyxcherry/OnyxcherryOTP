@@ -11,14 +11,7 @@ from app.auth.forms import (
     ResetPasswordForm,
     ResetPasswordRequestForm,
 )
-from app.models import (
-    OTP,
-    ResetPassword,
-    User,
-    Webauthn,
-    change_session_id,
-    generate_sid,
-)
+from app.models import OTP, ResetPassword, User, Webauthn, change_session_id
 from app.twofa.forms import CheckOTPCode
 from config import Config
 from flask import (
@@ -137,11 +130,7 @@ def register():
         return redirect(url_for("main.index"))
     form = RegistrationForm()
     if form.validate_on_submit():
-        new_user = User(
-            username=form.username.data,
-            sid=generate_sid(),
-            email=form.email.data,
-        )
+        new_user = User(username=form.username.data, email=form.email.data)
         new_user.set_password(form.password.data)
         db.session.add(new_user)
         db.session.commit()

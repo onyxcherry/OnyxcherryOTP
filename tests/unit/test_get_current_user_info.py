@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from app.models import User, generate_sid
+from app.models import User
 from app.webauthn.routes import get_current_user_info
 from flask import Flask
 
@@ -11,9 +11,7 @@ def test_get_current_user_info_id():
     assert user_database_id[0] == 2
 
 
-user = User(
-    did=7, username="thomas", sid=generate_sid(), email="thomas@gmail.com",
-)
+user = User(did=7, username="thomas", email="thomas@gmail.com")
 
 
 def test_get_current_user_info_token():

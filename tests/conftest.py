@@ -4,7 +4,7 @@ from datetime import datetime
 
 import pytest
 from app import Config, create_app, db
-from app.models import Key, User, Webauthn, generate_sid
+from app.models import Key, User, Webauthn
 from fido2.client import ClientData
 from fido2.ctap2 import AttestationObject, cbor
 from soft_webauthn import SoftWebauthnDevice
@@ -26,7 +26,7 @@ class KeyList:
 
 @pytest.fixture(scope="session")
 def user():
-    user = User(username="paul", sid=generate_sid(), email="paul@example.com",)
+    user = User(username="paul", email="paul@example.com")
     return user
 
 
@@ -49,43 +49,29 @@ def init_database():
 
     db.create_all()
 
-    user1 = User(
-        username="straw_berry",
-        sid=generate_sid(),
-        email="strawberry8@example.com",
-    )
+    user1 = User(username="straw_berry", email="strawberry8@example.com")
     user1.set_password("EJew@MHHQ7x-g.4<")
-    user2 = User(
-        username="josh_9", sid=generate_sid(), email="josh+otpapp@gmail.com",
-    )
+    user2 = User(username="josh_9", email="josh+otpapp@gmail.com")
     user2.set_password("m7ZTbjQdwuUFU/Zy6la+k6uUtniBExIgEhmBPduKexM=")
-    user3 = User(
-        username="dave", sid=generate_sid(), email="dave16@outlook.com",
-    )
+    user3 = User(username="dave", email="dave16@outlook.com")
     user3.set_password("wselfknskjdksdaiujlj")
     db.session.add(user1)
     db.session.add(user2)
     db.session.add(user3)
 
-    user4 = User(username="mark", sid=generate_sid(), email="mark@gmail.com",)
+    user4 = User(username="mark", email="mark@gmail.com")
     user4.set_password("c1c149afbf4c8996fb92427ae41e4649b934ca")
 
-    user5 = User(
-        username="jennie", sid=generate_sid(), email="jennie@gmail.com",
-    )
+    user5 = User(username="jennie", email="jennie@gmail.com")
     user5.set_password("9df1c362e4df3e51edd1acde9")
 
-    user6 = User(username="anna", sid=generate_sid(), email="anna@gmail.com",)
+    user6 = User(username="anna", email="anna@gmail.com")
     user6.set_password("ukehjwqbjhwqkbejw")
 
-    user7 = User(
-        username="thomas", sid=generate_sid(), email="thomas@gmail.com",
-    )
+    user7 = User(username="thomas", email="thomas@gmail.com")
     user7.set_password("qghjoiwjiklwek")
 
-    user8 = User(
-        username="oliver", sid=generate_sid(), email="oliver@gmail.com",
-    )
+    user8 = User(username="oliver", email="oliver@gmail.com")
     user8.set_password("2398wqshjduiwd8932")
 
     db.session.add(user4)

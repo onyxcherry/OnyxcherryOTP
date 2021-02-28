@@ -13,3 +13,8 @@ def test_session_id():
 
 def test_padded_id():
     assert User.get_padded_session_id_str(12) == "0012"
+
+
+def test_default_init_session_id():
+    user = User()
+    assert user.sid is not None

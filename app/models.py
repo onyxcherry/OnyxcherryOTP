@@ -18,13 +18,23 @@ def generate_sid() -> int:
 
 
 def change_session_id(user: object) -> None:
-    new_session_id = generate_sid()
+    last_session_id = user.sid
+    while True:
+        # check if session id differs from the latest
+        new_session_id = generate_sid()
+        if new_session_id != last_session_id:
+            break
     user.sid = new_session_id
     db.session.add(user)
     db.session.commit()
 
 
 class User(UserMixin, db.Model):
+    # __abstract__ = True
+    def __init__(self, *args, **kwargs):
+        self.sid = generate_sid()
+        super().__init__(*args, **kwargs)
+
     did = db.Column(db.Integer, primary_key=True)
     sid = db.Column(db.Integer)
     username = db.Column(db.String(64), index=True, unique=True)
