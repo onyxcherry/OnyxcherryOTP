@@ -17,18 +17,6 @@ def generate_sid() -> int:
     return cryptogen.randrange(9999)
 
 
-def change_session_id(user: object) -> None:
-    last_session_id = user.sid
-    while True:
-        # check if session id differs from the latest
-        new_session_id = generate_sid()
-        if new_session_id != last_session_id:
-            break
-    user.sid = new_session_id
-    db.session.add(user)
-    db.session.commit()
-
-
 class User(UserMixin, db.Model):
     # __abstract__ = True
     def __init__(self, *args, **kwargs):
@@ -50,6 +38,18 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return f"<User {self.username}>"
+
+    def change_session_id(self):
+        last_session_id = self.sid
+        while True:
+            # check if session id differs from the latest
+            new_session_id = generate_sid()
+            if new_session_id != last_session_id:
+                break
+        self.sid = new_session_id
+
+    def revoke_other_sessions(self):
+        self.change_session_id()
 
     @staticmethod
     def get_database_id(user_id: str) -> int:

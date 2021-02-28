@@ -11,7 +11,7 @@ from app.auth.forms import (
     ResetPasswordForm,
     ResetPasswordRequestForm,
 )
-from app.models import OTP, ResetPassword, User, Webauthn, change_session_id
+from app.models import OTP, ResetPassword, User, Webauthn
 from app.twofa.forms import CheckOTPCode
 from config import Config
 from flask import (
@@ -262,7 +262,9 @@ def revoke_other_sessions():
     got_id = current_user.get_id()
     user_database_id = User.get_database_id(got_id)
     user = User.query.filter_by(did=user_database_id).first()
-    change_session_id(user)
+    user.revoke_other_sessions()
+    db.session.add(user)
+    db.session.commit()
     login_user(user)
     flash(_("Revoked other sessions."))
     return redirect(url_for("main.index"))
