@@ -2,6 +2,7 @@ from app.models import User
 from flask_babel import _
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm, RecaptchaField
+from sqlalchemy import func
 from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import (
     DataRequired,
@@ -46,9 +47,11 @@ class RegistrationForm(FlaskForm):
     # custom validation function - they are handled by WTF's Form class method
     # validate(self, extra_validators=None)
     # [https://github.com/wtforms/wtforms/blob/244c8d6b15accb3e2efd622241e5f7c1cc8abb9d/wtforms/form.py#L299] # noqa: E501, B950
-    def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
-        if user or not username.data.isascii():
+    def validate_username(self, username_field):
+        user = User.query.filter(
+            func.lower(User.username) == username_field.data.lower()
+        ).first()
+        if user or not username_field.data.isascii():
             raise ValidationError(_("Please use a different username."))
 
     def validate_email(self, email):
