@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import pyotp
-from app import csrf, db
+from app import csrf, db, flask_bcrypt
 from app.auth import bp
 from app.auth.email import send_password_reset_email
 from app.auth.forms import (
@@ -65,13 +65,9 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
+        sample_password = flask_bcrypt.generate_password_hash(b"aaaa")
         if user is None:
-            user = User(
-                password_hash=(
-                    b"$2b$12$EFwWEz8m9."
-                    b"9tlZ708naK4OIyrPqb2mMaM0fUEYWOjaYSmOghPFOQu"
-                )
-            )
+            user = User(password_hash=sample_password)
         if not user.check_password(form.password.data):
             flash(_("Invalid username or password"))
             return redirect(url_for("auth.login"))
