@@ -1,4 +1,5 @@
 from datetime import datetime
+from distutils.util import strtobool
 
 import pyotp
 from app import csrf, db, flask_bcrypt
@@ -235,10 +236,15 @@ def refresh_login():
     if current_user.is_authenticated and login_fresh():
         next_page = get_next_page(request.args.get("next"))
         return redirect(next_page)
+    prefered_webauthn = strtobool(request.args.get("webauthn", "false"))
+    if prefered_webauthn:
+        return render_template("webauthn/login_with_webauthn.html")
     form = RefreshLogin()
     user_id = current_user.get_id()
     database_id = User.get_database_id(user_id)
     user = User.query.filter_by(did=database_id).first()
+    webauthn = Webauthn.query.filter_by(user_id=database_id).first()
+    webauthn_enabled = webauthn.is_enabled if webauthn is not None else False
     if form.validate_on_submit():
         if user.check_password(form.password.data):
             confirm_login()
@@ -248,7 +254,10 @@ def refresh_login():
         next_page = get_next_page(request.args.get("next"))
         return redirect(next_page)
     return render_template(
-        "auth/refresh_login.html", title=_("Refresh your session"), form=form
+        "auth/refresh_login.html",
+        title=_("Refresh your session"),
+        form=form,
+        webauthn_enabled=webauthn_enabled,
     )
 
 

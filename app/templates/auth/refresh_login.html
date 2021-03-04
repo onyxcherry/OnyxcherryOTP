@@ -8,4 +8,9 @@
     </div>
     {{ form.submit(class="btn btn-block login-btn mb-4") }}
 </form>
+
+{% if webauthn_enabled %}
+<div><a href="{{ url_for('auth.refresh_login') }}?webauthn=true">{{ _('Or instead use Webauthn') }}</a></div>
+{% endif %}
+
 {% endblock %}

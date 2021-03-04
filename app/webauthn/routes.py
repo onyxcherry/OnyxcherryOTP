@@ -112,7 +112,7 @@ def index():
 
 
 @bp.route("/check")
-@fresh_login_required
+@login_required
 def check():
     return render_template("webauthn/login_with_webauthn.html")
 
