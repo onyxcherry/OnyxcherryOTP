@@ -26,7 +26,8 @@ class User(UserMixin, db.Model):
     did = db.Column(db.Integer, primary_key=True)
     sid = db.Column(db.Integer)
     username = db.Column(db.String(64), index=True, unique=True)
-    email = db.Column(db.String(120), index=True, unique=True)
+    # See [https://www.rfc-editor.org/errata_search.php?rfc=3696&eid=1003]
+    email = db.Column(db.String(256), index=True, unique=True)
     # Bcrypt ignores bytes beyond 72th but it isn't necessary to inform about
     password_hash = db.Column(db.String(128))
     otp = db.relationship("OTP", backref="user", uselist=False)

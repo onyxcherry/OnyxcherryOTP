@@ -25,7 +25,7 @@ class RegistrationForm(FlaskForm):
         _l("Username"), validators=[DataRequired(), Length(min=3, max=64)]
     )
     email = StringField(
-        _l("Email"), validators=[DataRequired(), Email(), Length(max=120)]
+        _l("Email"), validators=[DataRequired(), Email(), Length(max=256)]
     )
     password = PasswordField(
         _l("Password"), validators=[DataRequired(), Length(min=8, max=128)]
@@ -54,8 +54,11 @@ class RegistrationForm(FlaskForm):
         if user or not username_field.data.isascii():
             raise ValidationError(_("Please use a different username."))
 
-    def validate_email(self, email):
-        user = User.query.filter_by(email=email.data).first()
+    def validate_email(self, email_field):
+        # make validation case-insensitive for the sake of security
+        user = User.query.filter(
+            func.lower(User.email) == email_field.data.lower()
+        ).first()
         if user:
             raise ValidationError(_("Please use a different email address."))
 
