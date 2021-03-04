@@ -90,6 +90,7 @@ class CSPSettings:
         "default-src": "'self'",
         "script-src": ["'strict-dynamic'"],
         "style-src": ["'self'"],
+        "img-src": ["'self'", "data:"],
         "frame-src": ["https://www.google.com/recaptcha/"],
         "object-src": "'none'",
         "base-uri": "'none'",
