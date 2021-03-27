@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 import pytest
-from app import Config, create_app, db
+from app import Config, create_app, db, rds
 from app.models import Key, User, Webauthn
 from fido2.client import ClientData
 from fido2.ctap2 import AttestationObject, cbor
@@ -42,6 +42,11 @@ def test_client():
     yield testing_client
 
     app_context.pop()
+
+
+@pytest.fixture(scope="function")
+def flush_redis():
+    rds.flushall()
 
 
 @pytest.fixture(scope="module")

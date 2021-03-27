@@ -1,5 +1,5 @@
 from app import cli, create_app, db
-from app.models import OTP, Key, ResetPassword, User, Webauthn
+from app.models import OTP, Key, User, Webauthn
 
 app = create_app()
 cli.register(app)
@@ -11,7 +11,6 @@ def make_shell_context():
         "db": db,
         "User": User,
         "OTP": OTP,
-        "ResetPasswordValue": ResetPassword,
         "Webauthn": Webauthn,
         "Key": Key,
     }

@@ -83,6 +83,12 @@ class Config(object):
     # Very useful when debugging especially templates. Change to True if needed
     EXPLAIN_TEMPLATE_LOADING = False
 
+    RESET_PASSWORD_TOKEN_EXPIRE_TIME = 600
+    MAX_RESET_PASSWORD_TOKENS = 10
+
+    REDIS_PORT = os.environ.get("REDIS_PORT") or 6379
+    REDIS_HOST = os.environ.get("REDIS_HOST") or "localhost"
+
 
 @dataclass
 class CSPSettings:

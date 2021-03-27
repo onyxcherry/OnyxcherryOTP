@@ -1,6 +1,8 @@
 import os
 from dataclasses import dataclass
 
+import fakeredis
+import redis
 from config import Config, CSPSettings
 from dotenv import load_dotenv
 from flask import Flask, current_app, render_template, request
@@ -13,6 +15,16 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
+
+pool = redis.ConnectionPool(
+    host=Config.REDIS_HOST, port=Config.REDIS_PORT, db=0
+)
+rds = redis.Redis(connection_pool=pool)
+
+try:
+    rds.ping()
+except redis.exceptions.ConnectionError:
+    rds = fakeredis.FakeStrictRedis()
 
 db = SQLAlchemy()
 migrate = Migrate()

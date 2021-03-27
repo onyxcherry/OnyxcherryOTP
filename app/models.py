@@ -1,7 +1,6 @@
 import binascii
 import os
 from base64 import b64encode
-from datetime import datetime, timedelta
 from random import SystemRandom
 from time import time
 from typing import Tuple
@@ -33,9 +32,6 @@ class User(UserMixin, db.Model):
     otp = db.relationship("OTP", backref="user", uselist=False)
     webauthn = db.relationship("Webauthn", backref="user", uselist=False)
     key = db.relationship("Key", backref="user")
-    reset_password_value = db.relationship(
-        "ResetPassword", backref="user", uselist=False
-    )
 
     def __repr__(self):
         return f"<User {self.username}>"
@@ -119,27 +115,6 @@ class User(UserMixin, db.Model):
         return b64encode(os.urandom(16)).decode("utf-8")
 
     @staticmethod
-    def delete_expired_tokens(reset_password: object):
-        now_compare_time = datetime.utcnow() - timedelta(seconds=600)
-        if (
-            reset_password.first_date
-            and reset_password.first_date < now_compare_time
-        ):
-            reset_password.first_value = None
-            reset_password.first_date = None
-            db.session.add(reset_password)
-            db.session.commit()
-        if (
-            reset_password.second_date
-            and reset_password.second_date < now_compare_time
-        ):
-            reset_password.second_value = None
-            reset_password.second_date = None
-            db.session.add(reset_password)
-            db.session.commit()
-        return
-
-    @staticmethod
     def verify_reset_password_token(token: str) -> Tuple[str, str]:
         try:
             jwt_decoded = jwt.decode(
@@ -182,19 +157,6 @@ class OTP(db.Model):
 
     def __repr__(self):
         return f"<OTP {self.secret}>"
-
-
-class ResetPassword(db.Model):
-    __tablename__ = "reset_password"
-    id = db.Column(db.Integer, primary_key=True)
-    first_value = db.Column(db.String(32))
-    first_date = db.Column(db.DateTime)
-    second_value = db.Column(db.String(32))
-    second_date = db.Column(db.DateTime)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.did"))
-
-    def __repr__(self):
-        return f"<ResetPasswordValue for user {self.user_id}>"
 
 
 class Webauthn(db.Model):

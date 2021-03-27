@@ -1,8 +1,7 @@
-from datetime import datetime
 from distutils.util import strtobool
 
 import pyotp
-from app import csrf, db, flask_bcrypt
+from app import csrf, db, flask_bcrypt, rds
 from app.auth import bp
 from app.auth.email import send_password_reset_email
 from app.auth.forms import (
@@ -12,7 +11,7 @@ from app.auth.forms import (
     ResetPasswordForm,
     ResetPasswordRequestForm,
 )
-from app.models import OTP, ResetPassword, User, Webauthn
+from app.models import OTP, User, Webauthn
 from app.twofa.forms import CheckOTPCode
 from config import Config
 from flask import (
@@ -45,6 +44,10 @@ def get_next_page(next_from_request: str) -> str:
 
 def generate_base32_secret():
     return pyotp.random_base32()
+
+
+def get_passwd_reset_key_prefix(user_database_id: int):
+    return f"rpr:{user_database_id}"
 
 
 @bp.before_request
@@ -148,44 +151,23 @@ def reset_password_request():
     form = ResetPasswordRequestForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if not user:
-            flash(
-                _(
-                    "Check your email for the instructions "
-                    "to reset your password."
-                )
+        should_send_mail = True
+        if user is None:
+            # prevent timing enumeration attacks
+            user = User(username="someuser")
+            should_send_mail = False
+
+        secret_value = user.get_random_base64_value()
+        jwt_token = user.get_reset_password_token(secret_value)
+        reset_pwd_keys = rds.keys(f"{get_passwd_reset_key_prefix(user.did)}:*")
+        if len(reset_pwd_keys) < Config.MAX_RESET_PASSWORD_TOKENS:
+            rds.set(
+                f"{get_passwd_reset_key_prefix(user.did)}:{secret_value}",
+                "2",  # whatever value
+                ex=Config.RESET_PASSWORD_TOKEN_EXPIRE_TIME,
             )
-            return redirect(url_for("auth.login"))
-
-        confirming_value = user.get_random_base64_value()
-        token = user.get_reset_password_token(confirming_value)
-        now = datetime.utcnow()
-        should_send_mail = False
-
-        reset_password = ResetPassword.query.filter_by(
-            user_id=user.did
-        ).first()
-        if reset_password:
-            user.delete_expired_tokens(reset_password)
-            if not reset_password.first_value:
-                reset_password.first_value = confirming_value
-                reset_password.first_date = now
-                should_send_mail = True
-            elif not reset_password.second_value:
-                reset_password.second_value = confirming_value
-                reset_password.second_date = now
-                should_send_mail = True
-            db.session.add(reset_password)
-        else:
-            reset_password_new = ResetPassword(
-                first_value=confirming_value, first_date=now, user_id=user.did
-            )
-            db.session.add(reset_password_new)
-            should_send_mail = True
-        db.session.commit()
-        if should_send_mail:
-            send_password_reset_email(user, token)
-
+            if should_send_mail:
+                send_password_reset_email(user, jwt_token)
         flash(
             _("Check your email for the instructions to reset your password.")
         )
@@ -203,30 +185,21 @@ def reset_password(token):
         return redirect(url_for("main.index"))
     username, value = User.verify_reset_password_token(token)
     user = User.query.filter_by(username=username).first()
-    if not user:
+    if user is None:
         return redirect(url_for("main.index"))
-    reset_password = ResetPassword.query.filter_by(user_id=user.did).first()
-    if reset_password:
-        user.delete_expired_tokens(reset_password)
+
     form = ResetPasswordForm()
     if form.validate_on_submit():
-        password = form.password.data
-        if value == reset_password.first_value:
-            reset_password.first_value = None
-            reset_password.first_date = None
-            user.set_password(password)
-        elif value == reset_password.second_value:
-            reset_password.second_value = None
-            reset_password.second_date = None
-            user.set_password(password)
-        else:
-            flash(_("Invalid or expired token"))
-            return redirect(url_for("auth.reset_password_request"))
-        db.session.add(reset_password)
-        db.session.add(user)
-        db.session.commit()
-        flash(_("Your password has been reset."))
-        return redirect(url_for("auth.login"))
+        new_password = form.password.data
+        # check if secret value is valid -> atomically delete it
+        if rds.delete(f"{get_passwd_reset_key_prefix(user.did)}:{value}"):
+            user.set_password(new_password)
+            db.session.add(user)
+            db.session.commit()
+            flash(_("Your password has been reset."))
+            return redirect(url_for("auth.login"))
+        flash(_("Invalid or expired token"))
+        return redirect(url_for("auth.reset_password_request"))
     return render_template("auth/reset_password.html", form=form)
 
 
