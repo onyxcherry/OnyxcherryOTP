@@ -7,7 +7,6 @@ flask_talisman==0.7.0
 -e git://github.com/maxcountryman/flask-login.git#egg=Flask_Login
 SQLAlchemy==1.3.23
 WTForms==2.3.1
-Flask_Bcrypt==0.7.1
 alembic==1.5.4
 soft_webauthn==0.1.2
 pyotp==2.3.0
@@ -20,3 +19,4 @@ python-dotenv==0.15.0
 email_validator==1.1.2
 redis==3.5.3
 fakeredis==1.5.0
+bcrypt==3.2.0

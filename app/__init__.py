@@ -8,7 +8,6 @@ from dotenv import load_dotenv
 from flask import Flask, current_app, render_template, request
 from flask_babel import Babel
 from flask_babel import lazy_gettext as _l
-from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -39,7 +38,6 @@ login.needs_refresh_message_category = "info"
 # Above strong mode causes deleting session cookie after recovered
 # cookie by remember-me option
 
-flask_bcrypt = Bcrypt()
 babel = Babel()
 csrf = CSRFProtect()
 talisman = Talisman()
@@ -62,7 +60,6 @@ def create_app(config_class=Config):
     login.init_app(app)
     csrf.init_app(app)
     babel.init_app(app)
-    flask_bcrypt.init_app(app)
 
     csp = CSPSettings()
     talisman.init_app(

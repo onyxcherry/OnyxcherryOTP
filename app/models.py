@@ -5,8 +5,9 @@ from random import SystemRandom
 from time import time
 from typing import Tuple
 
+import bcrypt
 import jwt
-from app import db, flask_bcrypt, login
+from app import db, login
 from flask import current_app
 from flask_login import UserMixin
 
@@ -83,10 +84,17 @@ class User(UserMixin, db.Model):
     def set_password(self, password: bytes):
         # do not explicit pass Bcrypt log rounds -
         # instead specify that in BCRYPT_LOG_ROUNDS environment
-        self.password_hash = flask_bcrypt.generate_password_hash(password)
+        salt = bcrypt.gensalt(
+            rounds=current_app.config.get("BCRYPT_LOG_ROUNDS")
+        )
+        if isinstance(password, str):
+            password = password.encode()
+        self.password_hash = bcrypt.hashpw(password, salt)
 
     def check_password(self, password: bytes):
-        return flask_bcrypt.check_password_hash(self.password_hash, password)
+        if isinstance(password, str):
+            password = password.encode()
+        return bcrypt.checkpw(password, self.password_hash)
 
     def set_valid_credentials(self, remember_me, expires_in=60):
         return jwt.encode(
