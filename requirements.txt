@@ -12,7 +12,6 @@ alembic==1.5.4
 soft_webauthn==0.1.2
 pyotp==2.3.0
 sendgrid==6.4.6
-Flask_Mail==0.9.1
 Flask==1.1.2
 click==7.1.2
 Werkzeug==1.0.1

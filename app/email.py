@@ -1,31 +1,25 @@
 import asyncio
 import os
-from threading import Thread
+import smtplib
+from email.mime.text import MIMEText
 
-from app import mail
-from config import setup_logger
-from flask import current_app
-from flask_mail import Message
+from config import Config, setup_logger
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Content, From, Mail, To
 
 email_logger = setup_logger("email_logger", "email.log")
 
 
-def send_async_email(app, msg):
-    with app.app_context():
-        mail.send(msg)
-
-
 def send_email_localhost(
-    subject, sender, sender_name, recipients, text_body, html_body
+    subject, sender_email, sender_name, recipient, text_body, html_body
 ):
-    msg = Message(subject, sender=sender, recipients=recipients)
-    msg.body = text_body
-    msg.html = html_body
-    Thread(
-        target=send_async_email, args=(current_app._get_current_object(), msg),
-    ).start()
+    msg = MIMEText(text_body)
+    msg["Subject"] = subject
+    msg["From"] = sender_email
+    msg["To"] = recipient
+
+    with smtplib.SMTP(Config.MAIL_SERVER, Config.MAIL_PORT) as server:
+        server.sendmail(sender_email, recipient, msg.as_string())
 
 
 def send_real_email(
@@ -42,27 +36,11 @@ def send_real_email(
     asyncio.run(send_email_sendgrid(em, sendgrid_client))
 
 
-def send_email(
-    subject, sender_email, sender_name, recipients, text_body, html_body
-):
+def send_email(*args, **kwargs):
     if os.environ.get("MAIL_LOCALHOST"):
-        send_email_localhost(
-            subject,
-            sender_email,
-            sender_name,
-            recipients,
-            text_body,
-            html_body,
-        )
+        send_email_localhost(*args, **kwargs)
     else:
-        send_real_email(
-            subject,
-            sender_email,
-            sender_name,
-            recipients,
-            text_body,
-            html_body,
-        )
+        send_real_email(*args, **kwargs)
 
 
 async def send_email_sendgrid(email, sendgrid_client):
@@ -70,7 +48,7 @@ async def send_email_sendgrid(email, sendgrid_client):
         response = sendgrid_client.send(email)
         if response.status_code < 300:
             email_logger.info(
-                f"Send email {response.status_code} "
+                f"Sent email {response.status_code} "
                 f"{response.headers} {response.body}"
             )
     except Exception as e:
