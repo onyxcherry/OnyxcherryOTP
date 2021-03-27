@@ -34,11 +34,10 @@ import os
 from datetime import datetime
 from typing import Tuple
 
-from app import db
+from app import Config, db
 from app.models import Key, User, Webauthn
 from app.webauthn import bp
 from app.webauthn.forms import DeleteKey, NameKey
-from config import Config
 from fido2 import cbor
 from fido2.attestation import Attestation, InvalidSignature
 from fido2.client import ClientData

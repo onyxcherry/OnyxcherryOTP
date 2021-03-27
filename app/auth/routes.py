@@ -14,7 +14,6 @@ from app.auth.forms import (
 )
 from app.models import OTP, User, Webauthn
 from app.twofa.forms import CheckOTPCode
-from config import Config
 from flask import (
     abort,
     flash,
@@ -34,6 +33,13 @@ from flask_login import (
     logout_user,
 )
 from werkzeug.urls import url_parse
+
+cookie_flags = {
+    "key": "token",
+    "max_age": 90,
+    "httponly": True,
+    "samesite": "Strict",
+}
 
 
 def get_next_page(next_from_request: str) -> str:
@@ -81,6 +87,7 @@ def login():
             return redirect(url_for("auth.login"))
         user_otp = OTP.query.filter_by(user_id=user.did).first()
         remember_me = form.remember_me.data
+        secure_flag = (current_app.config.get("HTTPS_ENABLED"),)
 
         webauthn = Webauthn.query.filter_by(user_id=user.did).first()
         if webauthn and webauthn.is_enabled is True:
@@ -89,15 +96,11 @@ def login():
                 render_template("webauthn/login_with_webauthn.html")
             )
             response.set_cookie(
-                "token",
-                value=token,
-                max_age=90,
-                secure=Config.HTTPS_ENABLED,
-                httponly=True,
-                samesite="Strict",
+                value=token, secure=secure_flag, **cookie_flags,
             )
             return response
-        if user_otp and user_otp.is_valid == 1:
+
+        elif user_otp and user_otp.is_valid == 1:
             user_otp.remaining_attempts = 3
             db.session.add(user_otp)
 
@@ -107,12 +110,7 @@ def login():
                 render_template("twofa/login_with_twofa.html", form=form)
             )
             response.set_cookie(
-                "token",
-                value=token,
-                max_age=90,
-                secure=Config.HTTPS_ENABLED,
-                httponly=True,
-                samesite="Strict",
+                value=token, secure=secure_flag, **cookie_flags,
             )
             db.session.commit()
             return response
@@ -144,7 +142,7 @@ def register():
         "auth/register.html",
         title=_("Register"),
         form=form,
-        recaptcha_public_key=Config.RECAPTCHA_PUBLIC_KEY,
+        recaptcha_public_key=current_app.config.get("RECAPTCHA_PUBLIC_KEY"),
     )
 
 
@@ -164,11 +162,13 @@ def reset_password_request():
         secret_value = user.get_random_base64_value()
         jwt_token = user.get_reset_password_token(secret_value)
         reset_pwd_keys = rds.keys(f"{get_passwd_reset_key_prefix(user.did)}:*")
-        if len(reset_pwd_keys) < Config.MAX_RESET_PASSWORD_TOKENS:
+        if len(reset_pwd_keys) < current_app.config.get(
+            "MAX_RESET_PASSWORD_TOKENS"
+        ):
             rds.set(
                 f"{get_passwd_reset_key_prefix(user.did)}:{secret_value}",
                 "2",  # whatever value
-                ex=Config.RESET_PASSWORD_TOKEN_EXPIRE_TIME,
+                ex=current_app.config.get("RESET_PASSWORD_TOKEN_EXPIRE_TIME"),
             )
             if should_send_mail:
                 send_password_reset_email(user, jwt_token)
