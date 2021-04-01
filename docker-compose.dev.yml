@@ -1,0 +1,13 @@
+services:
+  onyxcherryauth:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    volumes:
+      - ./app:/home/onyxcherry/OnyxcherryOTP/app
+      - ./migrations:/home/onyxcherry/OnyxcherryOTP/migrations
+      - ./babel.cfg:/home/onyxcherry/OnyxcherryOTP/babel.cfg
+      - ./config.py:/home/onyxcherry/OnyxcherryOTP/config.py
+      - ./setup.py:/home/onyxcherry/OnyxcherryOTP/setup.py
+      - ./onyxcherryotp.py:/home/onyxcherry/OnyxcherryOTP/onyxcherryotp.py

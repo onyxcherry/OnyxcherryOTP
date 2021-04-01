@@ -10,14 +10,26 @@ from dotenv import load_dotenv
 basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, ".env"))
 
+secrets_dir = "/run/secrets"
+
+
+def load_secret(secret_name):
+    try:
+        with open(os.path.join(secrets_dir, secret_name)) as secret_file:
+            return secret_file.read().rstrip("\n")
+    except IOError:
+        return None
+
 
 class Config(object):
     SECRET_KEY = (
-        os.environ.get("SECRET_KEY")
+        load_secret("SECRET_KEY")
+        or os.environ.get("SECRET_KEY")
         or base64.b64encode(os.urandom(32)).decode()
     )
     TWOFA_SECRET_KEY = (
-        os.environ.get("TWOFA_SECRET_KEY")
+        load_secret("TWOFA_SECRET_KEY")
+        or os.environ.get("TWOFA_SECRET_KEY")
         or base64.b64encode(os.urandom(32)).decode()
     )
     SQLALCHEMY_DATABASE_URI = os.environ.get(
@@ -25,8 +37,16 @@ class Config(object):
     ) or "sqlite:///" + os.path.join(basedir, "app.db")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    REDIS_PORT = os.environ.get("REDIS_PORT") or 6379
+    REDIS_HOST = os.environ.get("REDIS_HOST") or "localhost"
+
     MAIL_SERVER = os.environ.get("MAIL_SERVER")
     MAIL_PORT = int(os.environ.get("MAIL_PORT") or 465)
+    SENDGRID_API_KEY = load_secret("SENDGRID_API_KEY") or os.environ.get(
+        "SENDGRID_API_KEY"
+    )
+
+    RP_ID = os.environ.get("RP_ID") or "localhost"
 
     TESTING = strtobool(os.environ.get("TESTING") or "true")
 
@@ -68,11 +88,10 @@ class Config(object):
         or "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
     )
     RECAPTCHA_PRIVATE_KEY = (
-        os.environ.get("RECAPTCHA_PRIVATE_KEY")
+        load_secret("RECAPTCHA_PRIVATE_KEY")
+        or os.environ.get("RECAPTCHA_PRIVATE_KEY")
         or "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"
     )
-
-    RP_ID = os.environ.get("RP_ID") or "localhost"
 
     PREFERRED_URL_SCHEME = "https"
 
@@ -85,9 +104,6 @@ class Config(object):
 
     RESET_PASSWORD_TOKEN_EXPIRE_TIME = 600
     MAX_RESET_PASSWORD_TOKENS = 10
-
-    REDIS_PORT = os.environ.get("REDIS_PORT") or 6379
-    REDIS_HOST = os.environ.get("REDIS_HOST") or "localhost"
 
 
 @dataclass

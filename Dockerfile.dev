@@ -9,21 +9,11 @@ COPY requirements.txt requirements.txt
 
 RUN python -m venv venv && \
     venv/bin/pip install --no-cache-dir -r requirements.txt && \
-    venv/bin/pip install --no-cache-dir  gunicorn==20.0.4
-
-RUN venv/bin/pip install --no-cache-dir psycopg2-binary
-
-COPY app app
-COPY onyxcherryotp.py babel.cfg setup.py boot.sh ./
-COPY sample.env .env
-
-RUN chmod +x boot.sh
-
-ENV FLASK_APP onyxcherryotp.py
+    venv/bin/pip install --no-cache-dir  gunicorn==20.0.4 psycopg2-binary
 
 RUN chown -R onyxcherry:onyxcherry ./
 USER onyxcherry
 
 EXPOSE 5777
 
-ENTRYPOINT [ "./boot.sh" ]
+CMD ["venv/bin/gunicorn", "-b", ":5777", "--reload", "--access-logfile", "-", "--error-logfile", "-", "onyxcherryotp:app"]

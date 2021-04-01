@@ -1,0 +1,59 @@
+version: "3.9"
+services:
+  onyxcherryauth:
+    container_name: onyxcherryauth_main
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "5777:5777"
+    env_file:
+      - ./.env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://postgres:docker@postgres/onyxcherryotp
+      REDIS_HOST: redis
+      MAIL_SERVER: ${MAIL_SERVER}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_LOCALHOST: "${MAIL_LOCALHOST}"
+      HTTPS_ENABLED: "${HTTPS_ENABLED}"
+      ATTESTATION: "${ATTESTATION}"
+      TESTING: "${TESTING}"
+
+    secrets:
+      - SECRET_KEY
+      - TWOFA_SECRET_KEY
+      - SENDGRID_API_KEY
+    depends_on:
+      - redis
+      - postgres
+  redis:
+    container_name: onyxcherryauth_redis
+    image: redis:6.2.1
+    ports:
+      - "6379:6379"
+  postgres:
+    container_name: onyxcherryauth_postgres
+    image: postgres:13.2
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: docker
+      PGDATA: /data/postgres
+    volumes:
+      - onyx_postgres:/data/postgres
+    ports:
+      - "5432:5432"
+
+volumes:
+  onyx_postgres:
+
+secrets:
+  myfilesecret:
+    file: my_file_secret_file
+  SECRET_KEY:
+    file: secret_secret_key
+  TWOFA_SECRET_KEY:
+    file: secret_twofa_secret_key
+  SENDGRID_API_KEY:
+    file: secret_sendgrid_api_key

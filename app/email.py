@@ -3,7 +3,8 @@ import os
 import smtplib
 from email.mime.text import MIMEText
 
-from config import Config, setup_logger
+from app import current_app
+from config import setup_logger
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Content, From, Mail, To
 
@@ -18,7 +19,10 @@ def send_email_localhost(
     msg["From"] = sender_email
     msg["To"] = recipient
 
-    with smtplib.SMTP(Config.MAIL_SERVER, Config.MAIL_PORT) as server:
+    with smtplib.SMTP(
+        current_app.config.get("MAIL_SERVER"),
+        current_app.config.get("MAIL_PORT"),
+    ) as server:
         server.sendmail(sender_email, recipient, msg.as_string())
 
 
@@ -26,7 +30,7 @@ def send_real_email(
     subject, sender, sender_name, recipients, text_body, html_body
 ):
     sendgrid_client = SendGridAPIClient(
-        api_key=os.environ.get("SENDGRID_API_KEY")
+        api_key=current_app.config.get("SENDGRID_API_KEY")
     )
     from_email = From(sender, sender_name)
     to_email = To(recipients)
