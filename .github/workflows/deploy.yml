@@ -19,4 +19,4 @@ jobs:
           port: ${{ secrets.MYSERVERPORT }}
           username: ${{ secrets.MYUSERNAME }}
           key: ${{ secrets.MYSSHKEY }}
-          script: "cd ${{ secrets.MYPROJECTPATH }} && git pull && ${{ secrets.MYPROJECTPATH }}/venv/bin/pip install -e . && systemctl --user restart onyxcherryauth.service"
+          script: "cd ${{ secrets.MYPROJECTPATH }} && git pull && ${{ secrets.MYPROJECTPATH }}/venv/bin/pip install -e . && systemctl --user restart onyxcherryauth.service" # yamllint disable-line rule:line-length
