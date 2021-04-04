@@ -82,7 +82,6 @@ class Config(object):
     # [https://developers.google.com/recaptcha/docs/faq
     # #id-like-to-run-automated-tests-with-recaptcha.-what-should-i-do]
 
-    RECAPTCHA_PUBLIC_KEY = ""
     RECAPTCHA_PUBLIC_KEY = (
         os.environ.get("RECAPTCHA_PUBLIC_KEY")
         or "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
