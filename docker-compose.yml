@@ -11,7 +11,9 @@ services:
     env_file:
       - ./.env
     environment:
-      DATABASE_URL: postgresql+psycopg2://postgres:docker@postgres/onyxcherryotp
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-docker}
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-docker}@postgres/onyxcherryotp  # yamllint disable-line rule:line-length
       REDIS_HOST: redis
       MAIL_SERVER: ${MAIL_SERVER}
       MAIL_PORT: ${MAIL_PORT}
@@ -27,30 +29,46 @@ services:
     depends_on:
       - redis
       - postgres
+
+    cap_drop:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - FSETID
+      - KILL
+      - SETGID
+      - SETUID
+      - NET_BIND_SERVICE
+      - SYS_CHROOT
+      - MKNOD
+      - AUDIT_WRITE
+      - SETFCAP
+
   redis:
     container_name: onyxcherryauth_redis
     image: redis:6.2.1
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - onyx_redis:/data
   postgres:
     container_name: onyxcherryauth_postgres
     image: postgres:13.2
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: docker
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-docker}
       PGDATA: /data/postgres
     volumes:
       - onyx_postgres:/data/postgres
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
 
 volumes:
   onyx_postgres:
+  onyx_redis:
 
 secrets:
-  myfilesecret:
-    file: my_file_secret_file
   SECRET_KEY:
     file: secret_secret_key
   TWOFA_SECRET_KEY:

@@ -3,7 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    restart: unless-stopped
     volumes:
       - ./app:/home/onyxcherry/OnyxcherryOTP/app
       - ./migrations:/home/onyxcherry/OnyxcherryOTP/migrations
