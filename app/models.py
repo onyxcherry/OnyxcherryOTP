@@ -92,9 +92,14 @@ class User(UserMixin, db.Model):
         self.password_hash = bcrypt.hashpw(password, salt)
 
     def check_password(self, password: bytes):
-        if isinstance(password, str):
+        if not isinstance(password, bytes):
             password = password.encode()
-        return bcrypt.checkpw(password, self.password_hash)
+
+        user_password_hash = self.password_hash
+        # In case of storing password of type `str` in database
+        if not isinstance(user_password_hash, bytes):
+            user_password_hash = user_password_hash.encode()
+        return bcrypt.checkpw(password, user_password_hash)
 
     def set_valid_credentials(self, remember_me, expires_in=60):
         return jwt.encode(

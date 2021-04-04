@@ -82,7 +82,10 @@ def login():
         sample_password = bcrypt.hashpw(b"aaaa", sample_salt)
         if user is None:
             user = User(password_hash=sample_password)
-        if not user.check_password(form.password.data):
+        user_form_password = form.password.data
+        if not isinstance(user_form_password, bytes):
+            user_form_password = user_form_password.encode()
+        if not user.check_password(user_form_password):
             flash(_("Invalid username or password"))
             return redirect(url_for("auth.login"))
         user_otp = OTP.query.filter_by(user_id=user.did).first()
