@@ -1,39 +1,30 @@
-FROM python:3.9.1-slim-buster as builder
-
-RUN adduser --disabled-password --gecos "" onyxcherry
-WORKDIR /home/onyxcherry
+FROM debian:buster-slim as builder
 
 RUN apt-get -qq update && \
-    apt-get install -qq -y --no-install-recommends git
+    apt-get install -qq --yes --no-install-suggests --no-install-recommends python3-venv gcc libpython3-dev git && \
+    python3 -m venv /venv && /venv/bin/pip install --upgrade pip
 
-RUN git clone https://github.com/onyxcherry/OnyxcherryOTP.git
-WORKDIR /home/onyxcherry/OnyxcherryOTP
+RUN git clone https://github.com/onyxcherry/OnyxcherryOTP.git /code
+RUN /venv/bin/pip install --disable-pip-version-check -r /code/requirements.txt && \
+    /venv/bin/pip install --disable-pip-version-check gunicorn==20.0.4 psycopg2-binary==2.8.6
 
-RUN python -m venv venv && \
-    venv/bin/pip install --no-cache-dir -r requirements.txt && \
-    venv/bin/pip install --no-cache-dir  gunicorn==20.0.4 psycopg2-binary
+ENV PATH="/venv/bin:$PATH"
+ENV FLASK_APP=/code/onyxcherryotp.py
+WORKDIR /code
+RUN /venv/bin/flask translate compile
 
-FROM python:3.9.1-slim-buster
 
-RUN adduser --disabled-password --gecos "" onyxcherry
+FROM gcr.io/distroless/python3-debian10
 
-WORKDIR /home/onyxcherry/OnyxcherryOTP
+COPY --from=builder /code/app /code/app
+COPY --from=builder /code/config.py /code/config.py
+COPY --from=builder /code/babel.cfg /code/babel.cfg
+COPY --from=builder /code/setup.py /code/setup.py
+COPY --from=builder /code/onyxcherryotp.py /code/onyxcherryotp.py
+COPY --from=builder /venv /venv
 
-COPY --from=builder /home/onyxcherry/OnyxcherryOTP/app app
-COPY --from=builder /home/onyxcherry/OnyxcherryOTP/venv venv
-COPY --from=builder /home/onyxcherry/OnyxcherryOTP/boot.sh .
-COPY --from=builder /home/onyxcherry/OnyxcherryOTP/config.py .
-COPY --from=builder /home/onyxcherry/OnyxcherryOTP/babel.cfg .
-COPY --from=builder /home/onyxcherry/OnyxcherryOTP/setup.py .
-COPY --from=builder /home/onyxcherry/OnyxcherryOTP/onyxcherryotp.py .
-
-RUN chmod +x boot.sh
-
-ENV FLASK_APP onyxcherryotp.py
-
-RUN chown -R onyxcherry:onyxcherry ./
-USER onyxcherry
+WORKDIR /code
 
 EXPOSE 5777
 
-ENTRYPOINT [ "./boot.sh" ]
+ENTRYPOINT ["/venv/bin/python3", "/venv/bin/gunicorn", "-b", ":5777", "--chdir", "/code", "--reload", "--access-logfile", "-", "--error-logfile", "-", "onyxcherryotp:app"]
