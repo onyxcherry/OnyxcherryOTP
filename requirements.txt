@@ -15,7 +15,7 @@ sendgrid==6.4.6
 Flask_Mail==0.9.1
 Flask==1.1.2
 click==7.1.2
-Werkzeug==1.0.1
+Werkzeug==2.2.3
 PyJWT==2.0.1
 python-dotenv==0.15.0
 email_validator==1.1.2
